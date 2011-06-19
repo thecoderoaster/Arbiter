@@ -1,0 +1,6 @@
+vhdl isim_temp "BlazePackage.vhd"
+vhdl isim_temp "Scheduler.vhd"
+vhdl isim_temp "RAMBlock.vhd"
+vhdl isim_temp "ControlUnit.vhd"
+vhdl isim_temp "Arbiter.vhd"
+vhdl isim_temp "Arbiter_TB.vhd"

@@ -1,0 +1,28 @@
+Command line:
+   Arbiter_TB_isim_beh.exe
+     -simmode  gui
+     -simrunnum  0
+     -socket  49943
+
+Sun Jun 19 15:26:26 2011
+
+
+ Elaboration Time: 0.09375 sec
+
+ Current Memory Usage: 796.459 Meg
+
+ Total Signals          : 59
+ Total Nets             : 540
+ Total Signal Drivers   : 23
+ Total Blocks           : 10
+ Total Primitive Blocks : 8
+ Total Processes        : 7
+ Total Traceable Variables  : 33
+ Total Scalar Nets and Variables : 1063
+
+ Total Simulation Time: 6.92188 sec
+
+ Current Memory Usage: 481.653 Meg
+
+Sun Jun 19 15:26:45 2011
+

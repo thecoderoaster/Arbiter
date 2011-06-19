@@ -1,0 +1,6 @@
+vhdl work "BlazePackage.vhd"
+vhdl work "Scheduler.vhd"
+vhdl work "RAMBlock.vhd"
+vhdl work "ControlUnit.vhd"
+vhdl work "Arbiter.vhd"
+vhdl work "Arbiter_TB.vhd"
