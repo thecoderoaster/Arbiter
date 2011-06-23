@@ -5,7 +5,19 @@ This is a Full version of ISim.
 Time resolution is 1 ps
 # onerror resume
 # wave add /
-# run all
+# run 100ms
 Simulator is doing circuit initialization process.
 Finished circuit initialization process.
-Stopped at time : 2099519500 ns : File "C:/Users/kor/Documents/ArbiterTest/Arbiter_TB.vhd" Line 260
+# run 1.00us
+# run 1.00us
+# run 1.00us
+# run 1.00us
+# run 1.00us
+# run 1.00us
+# run 1.00us
+# run 1.00us
+# run 1.00us
+# run 1.00us
+# run 1.00us
+# run 1.00us
+# run 1.00us

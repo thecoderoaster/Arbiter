@@ -35,11 +35,11 @@
   </files>
 
   <transforms xmlns="http://www.xilinx.com/XMLSchema">
-    <transform xil_pn:end_ts="1308522076" xil_pn:name="TRAN_copyInitialToAbstractSimulation" xil_pn:start_ts="1308522076">
+    <transform xil_pn:end_ts="1308861811" xil_pn:name="TRAN_copyInitialToAbstractSimulation" xil_pn:start_ts="1308861811">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1308522360" xil_pn:in_ck="-5005671185525157588" xil_pn:name="TRAN_copyAbstractToPostAbstractSimulation" xil_pn:start_ts="1308522360">
+    <transform xil_pn:end_ts="1308870987" xil_pn:in_ck="-5005671185525157588" xil_pn:name="TRAN_copyAbstractToPostAbstractSimulation" xil_pn:start_ts="1308870987">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <outfile xil_pn:name="Arbiter.vhd"/>
@@ -49,19 +49,19 @@
       <outfile xil_pn:name="RAMBlock.vhd"/>
       <outfile xil_pn:name="Scheduler.vhd"/>
     </transform>
-    <transform xil_pn:end_ts="1308522076" xil_pn:name="TRAN_xawsToSimhdl" xil_pn:prop_ck="-3403323197565622348" xil_pn:start_ts="1308522076">
+    <transform xil_pn:end_ts="1308861811" xil_pn:name="TRAN_xawsToSimhdl" xil_pn:prop_ck="-3403323197565622348" xil_pn:start_ts="1308861811">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1308522076" xil_pn:name="TRAN_schematicsToHdlSim" xil_pn:prop_ck="-4464014913308018816" xil_pn:start_ts="1308522076">
+    <transform xil_pn:end_ts="1308861811" xil_pn:name="TRAN_schematicsToHdlSim" xil_pn:prop_ck="-4464014913308018816" xil_pn:start_ts="1308861811">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1308522076" xil_pn:name="TRAN_regenerateCoresSim" xil_pn:prop_ck="-8675114473156549370" xil_pn:start_ts="1308522076">
+    <transform xil_pn:end_ts="1308861811" xil_pn:name="TRAN_regenerateCoresSim" xil_pn:prop_ck="-8675114473156549370" xil_pn:start_ts="1308861811">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1308522360" xil_pn:in_ck="-5005671185525157588" xil_pn:name="TRAN_copyPostAbstractToPreSimulation" xil_pn:start_ts="1308522360">
+    <transform xil_pn:end_ts="1308870987" xil_pn:in_ck="-5005671185525157588" xil_pn:name="TRAN_copyPostAbstractToPreSimulation" xil_pn:start_ts="1308870987">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <outfile xil_pn:name="Arbiter.vhd"/>
@@ -71,9 +71,11 @@
       <outfile xil_pn:name="RAMBlock.vhd"/>
       <outfile xil_pn:name="Scheduler.vhd"/>
     </transform>
-    <transform xil_pn:end_ts="1308522370" xil_pn:in_ck="-5005671185525157588" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="3359335004576052943" xil_pn:start_ts="1308522360">
+    <transform xil_pn:end_ts="1308870996" xil_pn:in_ck="-5005671185525157588" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="3359335004576052943" xil_pn:start_ts="1308870987">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForOutputs"/>
+      <status xil_pn:value="OutputChanged"/>
       <outfile xil_pn:name="Arbiter_TB_beh.prj"/>
       <outfile xil_pn:name="Arbiter_TB_isim_beh.exe"/>
       <outfile xil_pn:name="fuse.log"/>
@@ -81,9 +83,11 @@
       <outfile xil_pn:name="isim.log"/>
       <outfile xil_pn:name="xilinxsim.ini"/>
     </transform>
-    <transform xil_pn:end_ts="1308522372" xil_pn:in_ck="7816359542427806765" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="8951173758839046437" xil_pn:start_ts="1308522370">
+    <transform xil_pn:end_ts="1308871173" xil_pn:in_ck="7816359542427806765" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="8951173758839046437" xil_pn:start_ts="1308871172">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForOutputs"/>
+      <status xil_pn:value="OutputChanged"/>
       <outfile xil_pn:name="Arbiter_TB_isim_beh.wdb"/>
       <outfile xil_pn:name="isim.cmd"/>
       <outfile xil_pn:name="isim.log"/>
