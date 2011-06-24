@@ -1,4 +1,4 @@
-----------------------------------------------------------------------------------
+					----------------------------------------------------------------------------------
 -- Company: 
 -- Engineer: 
 -- 
@@ -50,6 +50,9 @@ entity ControlUnit is
 			n_CTRflg				: out std_logic;
 			n_CtrlFlg			: in std_logic;
 			n_rnaCtrl			: in std_logic_vector(rsv_size-1 downto 0);
+			e_CTRflg				: out std_logic;
+			e_CtrlFlg			: in std_logic;
+			e_rnaCtrl			: in std_logic_vector(rsv_size-1 downto 0);
 			rna_ctrlPkt			: out std_logic_vector(rsv_size-1 downto 0)
 		);
 end ControlUnit;
@@ -97,113 +100,67 @@ begin
 --	scheduler_process: process
 --	begin
 --		wait until clk'event and clk = '1';
---			if(unit = "11111111") then
---				if(slot = "100") then
---					slot <= "000" after 1 ns;					--reset
---				else
---					slot <= slot + 1 after 1 ns;				--increment the slot (time expired on current slot)
---				end if;
+--			if(slot = "100") then
+--				slot <= "000" after 1 ns;					--reset
 --			else
---				unit <= unit + 1 after 1 ns;
+--				slot <= slot + 1 after 1 ns;				--increment the slot (time expired on current slot)
 --			end if;
 --	end process;
---	
---	--controlpacketNorth_process:	This process is responsible for control packets
---	--										sent in by the FCU from the north port
---		
+	
+	--controlpacketNorth_process:	This process is responsible for control packets
+	--										sent in by the FCU from the north port
+		
 	controlpacketNorth_process: process
 	begin
 		wait until clk'event and clk = '1';
 		if(n_CtrlFlg = '1' and table_full = '0') then
 			--Write to RsvTable
-				n_CTRflg <= '1';
-				address <= w_address;
-				sch_data_out <= n_rnaCtrl(3 downto 0);
-				rw <= '1';
-				sch_en <= '1';
-				ram_data_out <= n_rnaCtrl(19 downto 4);
-				ram_en <= '1';
-				rw <= '1';
-				n_CTRflg <= '0';
 				if(reserved_cnt < "1111") then
+					n_CTRflg <= '1';
+					address <= w_address;
+					sch_data_out <= n_rnaCtrl(3 downto 0);
+					rw <= '1';
+					sch_en <= '1';
+					ram_data_out <= n_rnaCtrl(19 downto 4);
+					ram_en <= '1';
+					rw <= '1';
+					n_CTRflg <= '0';
 					w_address <= w_address + 1;
 					reserved_cnt <= reserved_cnt + 1;
+					ram_en <= '0' after 10 ns;
+					sch_en <= '0' after 10 ns;
 				else
 					table_full <= '1';
 				end if;
-				ram_en <= '0' after 10 ns;
-				sch_en <= '0' after 10 ns;
 		elsif(n_CtrlFlg = '1' and table_full = '1') then
-				table_full <= '1';
+				table_full <= '1';	
+		end if;
+		
+		wait for 10 ns;
+		
+		if(e_CtrlFlg = '1' and table_full = '0') then
+			--Write to RsvTable
+				if(reserved_cnt < "1111") then
+					e_CTRflg <= '1';
+					address <= w_address;
+					sch_data_out <= e_rnaCtrl(3 downto 0);
+					rw <= '1';
+					sch_en <= '1';
+					ram_data_out <= e_rnaCtrl(19 downto 4);
+					ram_en <= '1';
+					rw <= '1';
+					e_CTRflg <= '0';
+					w_address <= w_address + 1;
+					reserved_cnt <= reserved_cnt + 1;
+					ram_en <= '0' after 10 ns;
+					sch_en <= '0' after 10 ns;
+				else
+					table_full <= '1';
+				end if;
+		elsif(e_CtrlFlg = '1' and table_full = '1') then
+				table_full <= '1';	
 		end if;
 	end process;
 	
---	controlpacketExecute_process: process
---	begin
---		wait until clk'event and clk = '1';
---		if(n_CtrlFlg = '0') then	
---			address <= nxt_addr after 1 ns;
---			rw = '1';
---			control_pkt <= data_in after 1 ns;
---		end if;
---	end process;
-	
---	generateControlPacket_process: process
---	begin
---		wait until clk'event and clk = '1';
---		if(slot = "001") then
---			address <= nxt_addr after 1 ns;
---			rw <= '0' after 1 ns;
---			rna_ctrlPkt <= data_in after 1 ns;
---		end if;
---	end process;
---			
-			
---	
---	--controlpacketEast_process:	This process is responsible for control packets
---	--										sent in by the FCU from the east port
---	controlpacketEast_process: process(e_CtrlFlg)
---	begin
---		if(e_CtrlFlg'event and e_CtrlFlg = '1') then
---			--Grab packet from FCU
---			packetE <= e_rnaCtrl after 20 ns;
---			e_CTRflg <= '1' after 30 ns;
---			e_CTRflg <= '0' after 50 ns;
---			--Grab Lock
---			--Write to RsvTable
---			--Release Lock
---		end if;
---	end process;
---	
---	--controlpacketSouth_process:	This process is responsible for control packets
---	--										sent in by the FCU from the south port
---	controlpacketSouth_process: process(s_CtrlFlg)
---	begin
---		if(s_CtrlFlg'event and s_CtrlFlg = '1') then
---			--Grab packet from FCU
---			packetS <= s_rnaCtrl after 20 ns;
---			s_CTRflg <= '1' after 30 ns;
---			s_CTRflg <= '0' after 50 ns;
---			--Grab Lock
---			--Write to RsvTable
---			--Release Lock
---		end if;
---	end process;
---	
---	--controlpacketWest_process:	This process is responsible for control packets
---	--										sent in by the FCU from the west port
---	controlpacketWest_process: process(w_CtrlFlg)
---	begin
---		if(w_CtrlFlg'event and w_CtrlFlg = '1') then
---			--Grab packet from FCU
---			packetW <= w_rnaCtrl after 20 ns;
---			w_CTRflg <= '1' after 30 ns;
---			w_CTRflg <= '0' after 50 ns;
---			--Grab Lock
---			--Write to RsvTable
---			--Release Lock
---		end if;
---	end process;
-
 end Behavioral;
 
