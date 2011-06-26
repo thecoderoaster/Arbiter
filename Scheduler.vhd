@@ -75,12 +75,17 @@ begin
 		wait until en'event and en = '1';
 			
 			--Read
-			q <= schedule(conv_integer(addr));
-				
+			if rw = '0' and en = '1' then
+				q <= schedule(conv_integer(addr));
+			
 			--Write
-			if rw = '1' and en = '1' then
+			elsif rw = '1' and en = '1' then
 				schedule(conv_integer(addr)) <= d;
+
+			else
+				q <= "ZZZZ";
 			end if;
+			
 	end process;
 
 end Behavioral;

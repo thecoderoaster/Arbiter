@@ -11,8 +11,8 @@ Parsing VHDL file "C:/Users/kor/Documents/ArbiterTest/Arbiter.vhd" into library 
 Parsing VHDL file "C:/Users/kor/Documents/ArbiterTest/Arbiter_TB.vhd" into library work
 Starting static elaboration
 Completed static elaboration
-Fuse Memory Usage: 135340 KB
-Fuse CPU Usage: 499 ms
+Fuse Memory Usage: 135084 KB
+Fuse CPU Usage: 468 ms
 Using precompiled package standard from library std
 Using precompiled package std_logic_1164 from library ieee
 Using precompiled package std_logic_arith from library ieee
@@ -28,5 +28,5 @@ Time Resolution for simulation is 1ps.
 Waiting for 3 sub-compilation(s) to finish...
 Compiled 15 VHDL Units
 Built simulation executable C:/Users/kor/Documents/ArbiterTest/Arbiter_TB_isim_beh.exe
-Fuse Memory Usage: 144280 KB
-Fuse CPU Usage: 796 ms
+Fuse Memory Usage: 144024 KB
+Fuse CPU Usage: 702 ms

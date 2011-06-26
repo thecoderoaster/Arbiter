@@ -1,2 +1,43 @@
 ISim log file
 Running: C:\Users\kor\Documents\ArbiterTest\Arbiter_TB_isim_beh.exe -gui -tclbatch isim.cmd -wdb C:/Users/kor/Documents/ArbiterTest/Arbiter_TB_isim_beh.wdb 
+ISim M.81d (signature 0xcb73ee62)
+This is a Full version of ISim.
+Time resolution is 1 ps
+# onerror resume
+# wave add /
+# run all
+Simulator is doing circuit initialization process.
+Finished circuit initialization process.
+Stopped at time : 1025500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
+# run all
+Stopped at time : 1728500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
+# run all
+Stopped at time : 2365500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
+# run all
+Stopped at time : 2816500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
+# run all
+Stopped at time : 3831500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
+# run all
+Stopped at time : 4534500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
+# run all
+Stopped at time : 5171500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
+# run all
+Stopped at time : 5622500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
+# run all
+Stopped at time : 6637500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
+# run all
+Stopped at time : 7340500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
+# run all
+Stopped at time : 7977500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
+# run all
+Stopped at time : 8428500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
+# run all
+Stopped at time : 9443500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
+# run all
+Stopped at time : 10146500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
+# run all
+Stopped at time : 10783500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
+# run all
+Stopped at time : 11234500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 238
+# run all
+Stopped at time : 5351975500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 122
