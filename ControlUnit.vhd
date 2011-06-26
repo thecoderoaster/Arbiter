@@ -1,4 +1,4 @@
-					----------------------------------------------------------------------------------
+				----------------------------------------------------------------------------------
 -- Company: 
 -- Engineer: 
 -- 
@@ -53,114 +53,164 @@ entity ControlUnit is
 			e_CTRflg				: out std_logic;
 			e_CtrlFlg			: in std_logic;
 			e_rnaCtrl			: in std_logic_vector(rsv_size-1 downto 0);
+			s_CTRflg				: out std_logic;
+			s_CtrlFlg			: in std_logic;
+			s_rnaCtrl			: in std_logic_vector(rsv_size-1 downto 0);
+			w_CTRflg				: out std_logic;
+			w_CtrlFlg			: in std_logic;
+			w_rnaCtrl			: in std_logic_vector(rsv_size-1 downto 0);
 			rna_ctrlPkt			: out std_logic_vector(rsv_size-1 downto 0)
 		);
 end ControlUnit;
 
 architecture Behavioral of ControlUnit is
-	signal control_pkt : std_logic_vector(rsv_size-1 downto 0);
+	signal pid_packet 		: std_logic_vector(word_size-1 downto 0);
+	signal tid_packet			: std_logic_vector(address_size-1 downto 0);
 	signal slot : 			std_logic_vector(2 downto 0) := "000";
 	signal timeunit :		std_logic_vector(15 downto 0) := "0000000000000000";
-	signal counter :		std_logic_vector(15 downto 0) := "0000000000000000";
-	signal start : 		std_logic := '0';
+	signal counter :		std_logic_vector(address_size-1 downto 0) := "0000";
+	signal start_timer : 		std_logic := '0';
 	signal w_address 		: std_logic_vector(address_size-1 downto 0) := "0000";
 	signal r_address		: std_logic_vector(address_size-1 downto 0) := "0000";
 	signal reserved_cnt	: std_logic_vector(address_size-1 downto 0) := "0000";
+	signal expires_in		: std_logic_vector(address_size-1 downto 0) := "0000";
+	signal departure		: std_logic := '0';
 	signal table_full 	: std_logic := '0';
+	signal strobe_r		: std_logic := '0';
+	signal strobe_w		: std_logic := '0';
+	type state_type is (start, north, east, south, west, rd);
+	signal state, next_state : state_type;
 
+	
 begin
-
-	--reset_process:		Creates a component reset of all signals
-	reset_process: process
-	begin
-		wait until rst'event and rst = '1';
-			--slot <= "000" after 1 ns;
-			--nxt_addr <= "0000" after 1 ns;
-			--counter <= "00000000" after 1 ns;
-			--unit <= "00000000" after 1 ns;
-			start <= '1' after 1 ns;
-	end process;
 
 	--timebase_process: 	Creates a "stopwatch" for establishing a timebase that
 	--							the packet transfers process requires to ensure QoS.
-	timebase_process: process
+	timebase_process: process(clk, rst)
 	begin
-		wait until clk'event and clk = '1';
-			if(start = '1') then
+	
+		if rst = '1' then
+			counter <= "0000";
+			timeunit <= "0000000000000000" after 1 ns;
+			
+		elsif rising_edge(clk) then
+			if(start_timer = '1') then
 				timeunit <= timeunit + "0000000000000001";
-				if(timeunit = "000000111110") then				-- 1000 cycles
-					counter <= counter + "0000000000000001";			--increment the counter by 1 tick
+				if(timeunit = "000000111110") then						-- 1000 cycles
+					counter <= counter + "0001";							--increment the counter by 1 tick
+--					if(counter = expires_in) then
+--						counter <= "0000";
+--						departure <= '1';										-- flag depart process (time for data packet to move)
+--						departure <= '0' after 10 ns;					
+--					end if;
+					timeunit <= "0000000000000000";
 				end if;
 			end if;
+		end if;
 	end process;
+	
+	--cpStateHandler_process: This process is responsible for assigning the next_state
 
---	--scheduler_process: 	Creates the time slot alloted to a process (below)
---	--								to execute critical code that must be mutually
---	--								exclusive.
---	scheduler_process: process
---	begin
---		wait until clk'event and clk = '1';
---			if(slot = "100") then
---				slot <= "000" after 1 ns;					--reset
---			else
---				slot <= slot + 1 after 1 ns;				--increment the slot (time expired on current slot)
---			end if;
---	end process;
-	
-	--controlpacketNorth_process:	This process is responsible for control packets
-	--										sent in by the FCU from the north port
-		
-	controlpacketNorth_process: process
+	process
 	begin
-		wait until clk'event and clk = '1';
-		if(n_CtrlFlg = '1' and table_full = '0') then
-			--Write to RsvTable
-				if(reserved_cnt < "1111") then
-					n_CTRflg <= '1';
-					address <= w_address;
-					sch_data_out <= n_rnaCtrl(3 downto 0);
-					rw <= '1';
-					sch_en <= '1';
-					ram_data_out <= n_rnaCtrl(19 downto 4);
-					ram_en <= '1';
-					rw <= '1';
-					n_CTRflg <= '0';
-					w_address <= w_address + 1;
-					reserved_cnt <= reserved_cnt + 1;
-					ram_en <= '0' after 10 ns;
-					sch_en <= '0' after 10 ns;
-				else
-					table_full <= '1';
-				end if;
-		elsif(n_CtrlFlg = '1' and table_full = '1') then
-				table_full <= '1';	
-		end if;
-		
-		wait for 10 ns;
-		
-		if(e_CtrlFlg = '1' and table_full = '0') then
-			--Write to RsvTable
-				if(reserved_cnt < "1111") then
-					e_CTRflg <= '1';
-					address <= w_address;
-					sch_data_out <= e_rnaCtrl(3 downto 0);
-					rw <= '1';
-					sch_en <= '1';
-					ram_data_out <= e_rnaCtrl(19 downto 4);
-					ram_en <= '1';
-					rw <= '1';
-					e_CTRflg <= '0';
-					w_address <= w_address + 1;
-					reserved_cnt <= reserved_cnt + 1;
-					ram_en <= '0' after 10 ns;
-					sch_en <= '0' after 10 ns;
-				else
-					table_full <= '1';
-				end if;
-		elsif(e_CtrlFlg = '1' and table_full = '1') then
-				table_full <= '1';	
-		end if;
+		wait until rising_edge(clk);
+		state <= next_state;
 	end process;
 	
+	process(state)
+	begin
+		case state is
+			when start =>
+				--Initiate timer here?
+				strobe_r <= '1', '0' after 1 ns;
+				next_state <= north;
+			when north =>
+				--Check flag
+				if(n_CtrlFlg = '1' and table_full = '0') then
+					--Ack!
+					n_CTRflg <= '1', '0' after 1 ns;
+					--Write bits to pid_packet
+					pid_packet <= n_rnaCtrl(19 downto 4);
+					--Write bits to tid_packet
+					tid_packet <= n_rnaCtrl(3 downto 0);
+					--Send to memory
+					strobe_w <= '1', '0' after 1 ns;
+				end if;
+				next_state <= east;
+			when east =>
+				--Check flag
+				if(e_CtrlFlg = '1' and table_full = '0') then
+					--Ack!
+					e_CTRflg <= '1', '0' after 1 ns;
+					--Write bits to pid_packet
+					pid_packet <= e_rnaCtrl(19 downto 4);
+					--Write bits to tid_packet
+					tid_packet <= e_rnaCtrl(3 downto 0);
+					--Send to memory
+					strobe_w <= '1', '0' after 1 ns;
+				end if;
+				next_state <= south;
+			when south =>
+				--Check flag
+				if(s_CtrlFlg = '1' and table_full = '0') then
+					--Ack!
+					s_CTRflg <= '1', '0' after 1 ns;
+					--Write bits to pid_packet
+					pid_packet <= s_rnaCtrl(19 downto 4);
+					--Write bits to tid_packet
+					tid_packet <= s_rnaCtrl(3 downto 0);
+					--Send to memory
+					strobe_w <= '1', '0' after 1 ns;
+				end if;
+				next_state <= west;
+			when west =>
+				--Check flag
+				if(w_CtrlFlg = '1' and table_full = '0') then
+					--Ack!
+					w_CTRflg <= '1', '0' after 1 ns;
+					--Write bits to pid_packet
+					pid_packet <= w_rnaCtrl(19 downto 4);
+					--Write bits to tid_packet
+					tid_packet <= w_rnaCtrl(3 downto 0);
+					--Send to memory
+					strobe_w <= '1', '0' after 1 ns;
+				end if;
+				next_state <= start;
+			when others =>
+				next_state <= start;
+		end case;
+	end process;
+	
+	process(strobe_r, strobe_w)
+	begin
+		if(strobe_w = '1') then
+			if(reserved_cnt < "1111") then
+				address <= w_address;
+				sch_data_out <= tid_packet;
+				rw <= '1';
+				sch_en <= '1';
+				ram_data_out <= pid_packet;
+				ram_en <= '1';
+				rw <= '1';
+				w_address <= w_address + 1;
+				reserved_cnt <= reserved_cnt + 1;
+				ram_en <= '0' after 2 ns;
+				sch_en <= '0' after 2 ns;
+			else
+				table_full <= '1';
+			end if;
+		elsif(strobe_r = '1') then
+			if(r_address /= w_address and start_timer = '0') then
+				address <= r_address;
+				rw <= '0';
+				sch_en <= '1';
+				expires_in <= sch_data_in after 1 ns;
+				r_address <= r_address + 1;
+				reserved_cnt <= reserved_cnt - 1;
+				start_timer <= '1';
+				sch_en <= '0' after 1 ns;
+			end if;
+		end if;
+	end process;
 end Behavioral;
 

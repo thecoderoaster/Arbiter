@@ -75,14 +75,11 @@ begin
 		wait until en'event and en = '1';
 			
 			--Read
-			if rw = '0' and en = '1' then
-				q <= schedule(conv_integer(addr));
-				--r_address <= r_address + 1;
+			q <= schedule(conv_integer(addr));
 				
 			--Write
-			elsif rw = '1' and en = '1' then
+			if rw = '1' and en = '1' then
 				schedule(conv_integer(addr)) <= d;
-				--w_address <= w_address + 1;
 			end if;
 	end process;
 

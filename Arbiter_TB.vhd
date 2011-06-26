@@ -83,29 +83,28 @@ ARCHITECTURE behavior OF Arbiter_TB IS
 --				w_vc_deqSel			: out std_logic_vector (1 downto 0);
 --				w_vc_deq				: out std_logic; 		
 --				
---				--FCU Related
+				--FCU Related
 				n_CTRflg				: out std_logic;										-- Send a CTR to neighbor for packet
 				e_CTRflg				: out std_logic;													
---				s_CTRflg				: out std_logic;
---				w_CTRflg				: out std_logic;
---				
+				s_CTRflg				: out std_logic;
+				w_CTRflg				: out std_logic;
+				
 				n_CtrlFlg			: in std_logic;										--Receive a control packet flag from neighbor 
 				e_CtrlFlg			: in std_logic;										--(data good from neighbor via fcu)
---				s_CtrlFlg			: in std_logic;
---				w_CtrlFlg			: in std_logic;
---				
---				
---				--Scheduler Related
+				s_CtrlFlg			: in std_logic;
+				w_CtrlFlg			: in std_logic;
+			
+				--Scheduler Related
 				n_rnaCtrl			: in std_logic_vector(RSV_WIDTH-1 downto 0);			-- Control Packet 
 				e_rnaCtrl			: in std_logic_vector(RSV_WIDTH-1 downto 0);
---				s_rnaCtrl			: in std_logic_vector(WIDTH downto 0);
---				w_rnaCtrl			: in std_logic_vector(WIDTH downto 0);
---				
---				-- Routing Table
---				
---				-- Reservation Table
---				
---				--Switch Related
+				s_rnaCtrl			: in std_logic_vector(RSV_WIDTH-1 downto 0);
+				w_rnaCtrl			: in std_logic_vector(RSV_WIDTH-1 downto 0);
+				
+				-- Routing Table
+				
+				-- Reservation Table
+				
+				--Switch Related
 --				n_dSel 				: out std_logic_vector (2 downto 0);			-- Select lines for data direction
 --				e_dSel 				: out std_logic_vector (2 downto 0);
 --				s_dSel 				: out std_logic_vector (2 downto 0);
@@ -128,12 +127,12 @@ ARCHITECTURE behavior OF Arbiter_TB IS
 	signal reset : std_logic := '0';
 	signal n_CtrlFlg :  std_logic := '0';	 
 	signal e_CtrlFlg :  std_logic := '0';										
---	signal s_CtrlFlg :  std_logic := '0';
---	signal w_CtrlFlg :  std_logic := '0';
+	signal s_CtrlFlg :  std_logic := '0';
+	signal w_CtrlFlg :  std_logic := '0';
 	signal n_rnaCtrl :  std_logic_vector(RSV_WIDTH-1 downto 0);
 	signal e_rnaCtrl :  std_logic_vector(RSV_WIDTH-1 downto 0);
---	signal s_rnaCtrl :  std_logic_vector(RSV_WIDTH downto 0);
---	signal w_rnaCtrl :  std_logic_vector(RSV_WIDTH downto 0);
+	signal s_rnaCtrl :  std_logic_vector(RSV_WIDTH-1 downto 0);
+	signal w_rnaCtrl :  std_logic_vector(RSV_WIDTH-1 downto 0);
 --	signal injt_ctrlPkt :  std_logic_vector (RSV_WIDTH downto 0);		
 
  	--Outputs
@@ -175,8 +174,8 @@ ARCHITECTURE behavior OF Arbiter_TB IS
 --				
 	signal n_CTRflg			:  std_logic := '0';										
 	signal e_CTRflg			:  std_logic := '0';													
---	signal s_CTRflg			:  std_logic := '0';
---	signal w_CTRflg			:  std_logic := '0';
+	signal s_CTRflg			:  std_logic := '0';
+	signal w_CTRflg			:  std_logic := '0';
 --	
 --	signal n_dSel 				:  std_logic_vector (2 downto 0);
 --	signal e_dSel 				:  std_logic_vector (2 downto 0);
@@ -201,12 +200,12 @@ BEGIN
 			 reset => reset,
           n_CtrlFlg => n_CtrlFlg,
           e_CtrlFlg => e_CtrlFlg,
---          s_CtrlFlg => s_CtrlFlg,
---          w_CtrlFlg => w_CtrlFlg,
+          s_CtrlFlg => s_CtrlFlg,
+          w_CtrlFlg => w_CtrlFlg,
           n_rnaCtrl => n_rnaCtrl,
           e_rnaCtrl => e_rnaCtrl,
---          s_rnaCtrl => s_rnaCtrl,
---          w_rnaCtrl => w_rnaCtrl,
+          s_rnaCtrl => s_rnaCtrl,
+          w_rnaCtrl => w_rnaCtrl,
 --          injt_ctrlPkt => injt_ctrlPkt,
 --          n_vc_fStatSel => n_vc_fStatSel,
 --          n_vc_enqSel => n_vc_enqSel,
@@ -242,8 +241,8 @@ BEGIN
 --          w_vc_deq => w_vc_deq,
           n_CTRflg => n_CTRflg,
 			 e_CTRflg => e_CTRflg,
---			 s_CTRflg => s_CTRflg,
---			 w_CTRflg => w_CTRflg,
+			 s_CTRflg => s_CTRflg,
+			 w_CTRflg => w_CTRflg,
 --			 n_dSel => n_dSel,
 --			 e_dSel => e_dSel,
 --			 s_dSel => s_dSel,
@@ -276,7 +275,7 @@ BEGIN
 --		n_vc_dataOutSel <= "00";
 --		n_vc_deqSel <= "00";
 --		n_vc_deq <= '0'; 			
---
+
 --		e_vc_fStatSel <= "00";
 --		e_vc_enqSel <= "00";
 --		e_vc_statSel <= "00";
@@ -285,7 +284,7 @@ BEGIN
 --		e_vc_dataOutSel <= "00";
 --		e_vc_deqSel <= "00";
 --		e_vc_deq <= '0';
---		
+		
 --		s_vc_fStatSel <= "00";
 --		s_vc_enqSel <= "00";
 --		s_vc_statSel <= "00";
@@ -294,7 +293,7 @@ BEGIN
 --		s_vc_dataOutSel <= "00";
 --		s_vc_deqSel <= "00";
 --		s_vc_deq <= '0'; 	
---
+
 --		w_vc_fStatSel <= "00";
 --		w_vc_enqSel <= "00";
 --		w_vc_statSel <= "00";
@@ -306,9 +305,9 @@ BEGIN
 				
 		n_CTRflg	<= '0';
 		e_CTRflg	<= '0';												
---		s_CTRflg	<= '0';
---		w_CTRflg	<= '0';
---		
+		s_CTRflg	<= '0';
+		w_CTRflg	<= '0';
+		
 --		n_dSel <= "000";
 --		e_dSel <= "000";
 --		s_dSel <= "000";
@@ -317,90 +316,116 @@ BEGIN
 --
 		n_rnaCtrl <= "0000000000000000000000000000000000000000";
 		e_rnaCtrl <= "0000000000000000000000000000000000000000";
+		s_rnaCtrl <= "0000000000000000000000000000000000000000";
+		w_rnaCtrl <= "0000000000000000000000000000000000000000";
 		rna_ctrlPkt <= "0000000000000000000000000000000000000000";
 		n_CtrlFlg <= '0';
 		e_CtrlFlg <= '0';
+		s_CtrlFlg <= '0';
+		w_CtrlFlg <= '0';
+		reset <= '0';
+		wait for 1 ps;
+		reset <= '1';
+		wait for 1 ps;
 		reset <= '0';
 		
-		-- hold reset state for 100ms.
-		wait for 100 ms;
-		reset <= '1';
-		reset <= '0' after 1 us;
-      
 		--Wait 10 us before starting
 		wait for clk_period*10;			
 	
 		-- insert stimulus here
 		n_rnaCtrl <= "0000000010101010000000000000000000001111";	--PID : 15
 		n_CtrlFlg <= '1';
-		n_CtrlFlg <= '0' after 1 us;
+--		n_CtrlFlg <= '0' after 1 us;
 		e_rnaCtrl <= "1111010101101010100100111111000001001010";	--PID : 10
 		e_CtrlFlg <= '1';
-		e_CtrlFlg <= '0' after 1 us;
+--		e_CtrlFlg <= '0' after 1 us;
+		w_rnaCtrl <= "1111010101101010100100111111000001100110";	--PID : 6
+		w_CtrlFlg <= '1';
+--		w_CtrlFlg <= '0' after 1 us;
+		s_rnaCtrl <= "1111010101101010100100111111000010011001";	--PID:  9
+		s_CtrlFlg <= '1';
+--		s_CtrlFlg <= '0' after 1 us;
 		wait for 1 us;
-		n_rnaCtrl <= "1111010101101010100000000000000000011011";	--PID : 11
-		n_CtrlFlg <= '1';
-		n_CtrlFlg <= '0' after 1 us;
-		wait for 1 us;
-		e_rnaCtrl <= "1111010101101010100100111111000000100010";	--PID : 2
-		e_CtrlFlg <= '1';
-		e_CtrlFlg <= '0' after 1 us;
-		wait for 1 us;
-		n_rnaCtrl <= "1111010101101010100100111111000000110011";	--PID : 3
-		n_CtrlFlg <= '1';
-		n_CtrlFlg <= '0' after 1 us;
-		wait for 1 us;
-		e_rnaCtrl <= "1111010101101010100100111111000001001010";	--PID : 10
-		e_CtrlFlg <= '1';
-		e_CtrlFlg <= '0' after 1 us;
-		wait for 1 us;
-		e_rnaCtrl <= "1111010101101010100100111111000001011110";  --PID : 14
-		e_CtrlFlg <= '1';
-		e_CtrlFlg <= '0' after 1 us;
-		wait for 1 us;
-		n_rnaCtrl <= "1111010101101010100100111111000001100110";	--PID : 6
-		n_CtrlFlg <= '1';
-		n_CtrlFlg <= '0' after 1 us;
-		wait for 1 us;
-		n_rnaCtrl <= "1111010101101010100100111111000001110111";	--PID:  7
-		n_CtrlFlg <= '1';
-		n_CtrlFlg <= '0' after 1 us;
-		wait for 1 us;
-		n_rnaCtrl <= "1111010101101010100100111111000010001000";	--PID:  8
-		n_CtrlFlg <= '1';
-		n_CtrlFlg <= '0' after 1 us;
-		wait for 1 us;
-		e_rnaCtrl <= "1111010101101010100100111111000010011001";	--PID:  9
-		e_CtrlFlg <= '1';
-		e_CtrlFlg <= '0' after 1 us;
-		wait for 1 us;
-		n_rnaCtrl <= "1111010101101010100100111111000010101100";	--PID: 12
-		n_CtrlFlg <= '1';
-		n_CtrlFlg <= '0' after 1 us;
-		wait for 1 us;
-		e_rnaCtrl <= "1111010101101010100100111111000010111101";	--PID: 13
-		e_CtrlFlg <= '1';
-		e_CtrlFlg <= '0' after 1 us;
-		wait for 1 us;
-		e_rnaCtrl <= "1111010101101010100100111111000011000000";	--PID: 0
-		e_CtrlFlg <= '1';
-		e_CtrlFlg <= '0' after 1 us;
-		wait for 1 us;
-		n_rnaCtrl <= "1111010101101010100100111111000011010100";	--PID:  4
-		n_CtrlFlg <= '1';
-		n_CtrlFlg <= '0' after 1 us;
-		wait for 1 us;
-		e_rnaCtrl <= "1111010101101010100100111111000011100101"; 	--PID:  5
-		e_CtrlFlg <= '1';
-		e_CtrlFlg <= '0' after 1 us;
-		wait for 1 us;
-		e_rnaCtrl <= "1111010101101010100100111111000011110001";	--PID: 1
-		e_CtrlFlg <= '1';
-		e_CtrlFlg <= '0' after 1 us;
-		wait for 1 us;
-		n_rnaCtrl <= "1111010101101010100100111111111111110000";	--PID: 0
-		n_CtrlFlg <= '1';
-		n_CtrlFlg <= '0' after 1 us;
+		
+--		n_rnaCtrl <= "1111010101101010100000000000000000011011";	--PID : 11
+--		n_CtrlFlg <= '1';
+--		n_CtrlFlg <= '0' after 1 us;
+--		wait for 1 us;
+--		e_rnaCtrl <= "1111010101101010100100111111000000100010";	--PID : 2
+--		e_CtrlFlg <= '1';
+--		e_CtrlFlg <= '0' after 1 us;
+--		wait for 1 us;
+--		n_rnaCtrl <= "1111010101101010100100111111000000110011";	--PID : 3
+--		n_CtrlFlg <= '1';
+--		n_CtrlFlg <= '0' after 1 us;
+--		w_rnaCtrl <= "1111010101101010100100111111000001100110";	--PID : 6
+--		w_CtrlFlg <= '1';
+--		w_CtrlFlg <= '0' after 1 us;
+--		s_rnaCtrl <= "1111010101101010100100111111000010011001";	--PID:  9
+--		s_CtrlFlg <= '1';
+--		s_CtrlFlg <= '0' after 1 us;
+--		wait for 1 us;
+--		n_rnaCtrl <= "1111010101101010100100111111000000110011";	--PID : 3
+--		n_CtrlFlg <= '1';
+--		n_CtrlFlg <= '0' after 1 us;
+--		wait for 1 us;
+--		e_rnaCtrl <= "1111010101101010100100111111000001001010";	--PID : 10
+--		e_CtrlFlg <= '1';
+--		e_CtrlFlg <= '0' after 1 us;
+--		wait for 1 us;
+--		e_rnaCtrl <= "1111010101101010100100111111000001011110";  --PID : 14
+--		e_CtrlFlg <= '1';
+--		e_CtrlFlg <= '0' after 1 us;
+--		wait for 1 us;
+--		n_rnaCtrl <= "1111010101101010100100111111000001100110";	--PID : 6
+--		n_CtrlFlg <= '1';
+--		n_CtrlFlg <= '0' after 1 us;
+--		wait for 1 us;
+--		n_rnaCtrl <= "1111010101101010100100111111000001110111";	--PID:  7
+--		n_CtrlFlg <= '1';
+--		n_CtrlFlg <= '0' after 1 us;
+--		wait for 1 us;
+--		n_rnaCtrl <= "1111010101101010100100111111000010001000";	--PID:  8
+--		n_CtrlFlg <= '1';
+--		n_CtrlFlg <= '0' after 1 us;
+--		wait for 1 us;
+--		e_rnaCtrl <= "1111010101101010100100111111000010011001";	--PID:  9
+--		e_CtrlFlg <= '1';
+--		e_CtrlFlg <= '0' after 1 us;
+--		wait for 1 us;
+--		n_rnaCtrl <= "1111010101101010100100111111000010101100";	--PID: 12
+--		n_CtrlFlg <= '1';
+--		n_CtrlFlg <= '0' after 1 us;
+--		wait for 1 us;
+--		e_rnaCtrl <= "1111010101101010100100111111000010111101";	--PID: 13
+--		e_CtrlFlg <= '1';
+--		e_CtrlFlg <= '0' after 1 us;
+--		wait for 1 us;
+--		e_rnaCtrl <= "1111010101101010100100111111000011000000";	--PID: 0
+--		e_CtrlFlg <= '1';
+--		e_CtrlFlg <= '0' after 1 us;
+--		wait for 1 us;
+--		n_rnaCtrl <= "1111010101101010100100111111000011010100";	--PID:  4
+--		n_CtrlFlg <= '1';
+--		n_CtrlFlg <= '0' after 1 us;
+--		s_rnaCtrl <= "1111010101101010100100111111000011110001";	--PID: 1
+--		s_CtrlFlg <= '1';
+--		s_CtrlFlg <= '0' after 1 us;
+--		w_rnaCtrl <= "1111010101101010100100111111000011110001";	--PID: 1
+--		w_CtrlFlg <= '1';
+--		w_CtrlFlg <= '0' after 1 us;
+--		wait for 1 us;
+--		e_rnaCtrl <= "1111010101101010100100111111000011100101"; 	--PID:  5
+--		e_CtrlFlg <= '1';
+--		e_CtrlFlg <= '0' after 1 us;
+--		wait for 1 us;
+--		e_rnaCtrl <= "1111010101101010100100111111000011110001";	--PID: 1
+--		e_CtrlFlg <= '1';
+--		e_CtrlFlg <= '0' after 1 us;
+--		wait for 1 us;
+--		n_rnaCtrl <= "1111010101101010100100111111111111110000";	--PID: 0
+--		n_CtrlFlg <= '1';
+--		n_CtrlFlg <= '0' after 1 us;
 			
       wait;
    end process;

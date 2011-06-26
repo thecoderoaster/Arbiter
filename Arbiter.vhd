@@ -89,20 +89,20 @@ entity Arbiter is
 --				--FCU Related
 				n_CTRflg				: out std_logic;										-- Send a CTR to neighbor for packet
 				e_CTRflg				: out std_logic;													
---				s_CTRflg				: out std_logic;
---				w_CTRflg				: out std_logic;
+				s_CTRflg				: out std_logic;
+				w_CTRflg				: out std_logic;
 --				
 				n_CtrlFlg			: in std_logic;										--Receive a control packet flag from neighbor 
 				e_CtrlFlg			: in std_logic;										--(data good from neighbor via fcu)
---				s_CtrlFlg			: in std_logic;
---				w_CtrlFlg			: in std_logic;
+				s_CtrlFlg			: in std_logic;
+				w_CtrlFlg			: in std_logic;
 --				
 --				
 --				--Scheduler Related
 				n_rnaCtrl			: in std_logic_vector(RSV_WIDTH-1 downto 0);			-- Control Packet 
 				e_rnaCtrl			: in std_logic_vector(RSV_WIDTH-1 downto 0);
---				s_rnaCtrl			: in std_logic_vector(WIDTH downto 0);
---				w_rnaCtrl			: in std_logic_vector(WIDTH downto 0);
+				s_rnaCtrl			: in std_logic_vector(RSV_WIDTH-1 downto 0);
+				w_rnaCtrl			: in std_logic_vector(RSV_WIDTH-1 downto 0);
 								
 --				--Switch Related
 --				n_dSel 				: out std_logic_vector (2 downto 0);			-- Select lines for data direction
@@ -166,6 +166,12 @@ architecture rtl of Arbiter is
 			e_CTRflg				: out std_logic;
 			e_CtrlFlg			: in std_logic;
 			e_rnaCtrl			: in std_logic_vector(rsv_size-1 downto 0);
+			s_CTRflg				: out std_logic;
+			s_CtrlFlg			: in std_logic;
+			s_rnaCtrl			: in std_logic_vector(rsv_size-1 downto 0);
+			w_CTRflg				: out std_logic;
+			w_CtrlFlg			: in std_logic;
+			w_rnaCtrl			: in std_logic_vector(rsv_size-1 downto 0);
 			rna_ctrlPkt			: out std_logic_vector(rsv_size-1 downto 0)
 		);
 	end component;
@@ -194,7 +200,8 @@ begin
 	Control	: ControlUnit
 		generic map(RSV_WIDTH, PID_WIDTH, ADDR_WIDTH)
 		port map(clk, reset, rt_data_out, rt_data_in, sh_data_out, sh_data_in, rt_address, rw, rt_en, sh_en, 
-					n_CTRFlg, n_CtrlFlg, n_rnaCtrl, e_CTRFlg, e_CtrlFlg, e_rnaCtrl, rna_ctrlPkt);
+					n_CTRFlg, n_CtrlFlg, n_rnaCtrl, e_CTRFlg, e_CtrlFlg, e_rnaCtrl, s_CTRFlg, s_CtrlFlg, s_rnaCtrl,
+					w_CTRFlg, w_CtrlFlg, w_rnaCtrl, rna_ctrlPkt);
 	
 	
 end rtl;
