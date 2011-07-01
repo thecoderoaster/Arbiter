@@ -8,36 +8,20 @@ Time resolution is 1 ps
 # run all
 Simulator is doing circuit initialization process.
 Finished circuit initialization process.
-Stopped at time : 1025500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
+Stopped at time : 12500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 159
 # run all
-Stopped at time : 1728500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
+Stopped at time : 13500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 172
 # run all
-Stopped at time : 2365500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
+Stopped at time : 19500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 159
 # run all
-Stopped at time : 2816500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
+Stopped at time : 20500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 172
 # run all
-Stopped at time : 3831500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
+Stopped at time : 25500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 159
 # run all
-Stopped at time : 4534500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
+Stopped at time : 26500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 172
 # run all
-Stopped at time : 5171500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
+Stopped at time : 31500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 159
 # run all
-Stopped at time : 5622500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
+Stopped at time : 32500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 172
 # run all
-Stopped at time : 6637500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
-# run all
-Stopped at time : 7340500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
-# run all
-Stopped at time : 7977500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
-# run all
-Stopped at time : 8428500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
-# run all
-Stopped at time : 9443500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
-# run all
-Stopped at time : 10146500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
-# run all
-Stopped at time : 10783500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 233
-# run all
-Stopped at time : 11234500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 238
-# run all
-Stopped at time : 5351975500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 122
+Stopped at time : 929500 ns : File "C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd" Line 254

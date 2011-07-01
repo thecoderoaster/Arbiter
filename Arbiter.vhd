@@ -147,15 +147,16 @@ architecture rtl of Arbiter is
 	
 	component ControlUnit
 	generic(rsv_size		: natural;
-			  word_size 	: natural;
-			  address_size	: natural);
+			  address_size : natural;
+			  pid_size 		: natural;
+			  tid_size		: natural);
 	port(
 			clk				   : in std_logic;
 			rst					: in std_logic;
-			ram_data_in			: in std_logic_vector (word_size-1 downto 0);
-			ram_data_out		: out std_logic_vector (word_size-1 downto 0);
-			sch_data_in			: in std_logic_vector(address_size-1 downto 0);
-			sch_data_out		: out std_logic_vector(address_size-1 downto 0);
+			ram_data_in			: in std_logic_vector (pid_size-1 downto 0);
+			ram_data_out		: out std_logic_vector (pid_size-1 downto 0);
+			sch_data_in			: in std_logic_vector(tid_size-1 downto 0);
+			sch_data_out		: out std_logic_vector(tid_size-1 downto 0);
 			address				: out std_logic_vector (address_size-1 downto 0);
 			rw						: out std_logic;
 			ram_en				: out std_logic;
@@ -180,8 +181,8 @@ architecture rtl of Arbiter is
 	signal rt_data_in				: std_logic_vector (PID_WIDTH-1 downto 0);
 	signal rt_data_out			: std_logic_vector (PID_WIDTH-1 downto 0);
 	signal rt_en					: std_logic;
-	signal sh_data_in				: std_logic_vector (ADDR_WIDTH-1 downto 0);
-	signal sh_data_out			: std_logic_vector (ADDR_WIDTH-1 downto 0);
+	signal sh_data_in				: std_logic_vector (TID_WIDTH-1 downto 0);
+	signal sh_data_out			: std_logic_vector (TID_WIDTH-1 downto 0);
 	signal sh_en					: std_logic;
 	signal rt_address				: std_logic_vector (ADDR_WIDTH-1 downto 0);
 	signal rw						: std_logic;
@@ -189,16 +190,16 @@ architecture rtl of Arbiter is
 	
 begin
 	
-	RoutingTable : RAMBlock
+	ReservationTable : RAMBlock
 		generic map (PID_WIDTH, ADDR_WIDTH)
 		port map (rt_data_in, reset, rt_address, clk, rw, rt_en, rt_data_out);
 	
 	SchedulerUnit: Scheduler
-		generic map (ADDR_WIDTH, ADDR_WIDTH)
+		generic map (TID_WIDTH, ADDR_WIDTH)
 		port map(sh_data_in, reset, rt_address, clk, rw, sh_en, sh_data_out);
 	
 	Control	: ControlUnit
-		generic map(RSV_WIDTH, PID_WIDTH, ADDR_WIDTH)
+		generic map(RSV_WIDTH, ADDR_WIDTH, PID_WIDTH, TID_WIDTH)
 		port map(clk, reset, rt_data_out, rt_data_in, sh_data_out, sh_data_in, rt_address, rw, rt_en, sh_en, 
 					n_CTRFlg, n_CtrlFlg, n_rnaCtrl, e_CTRFlg, e_CtrlFlg, e_rnaCtrl, s_CTRFlg, s_CtrlFlg, s_rnaCtrl,
 					w_CTRFlg, w_CtrlFlg, w_rnaCtrl, rna_ctrlPkt);

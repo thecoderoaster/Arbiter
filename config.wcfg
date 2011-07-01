@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="C:/Users/kor/Documents/ArbiterTest/Arbiter_TB_isim_beh.wdb" id="1" type="auto">
+         <top_modules>
+            <top_module name="arbiter_tb" />
+            <top_module name="numeric_std" />
+            <top_module name="router_library" />
+            <top_module name="std_logic_1164" />
+            <top_module name="std_logic_arith" />
+            <top_module name="std_logic_unsigned" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <WVObjectSize size="24" />
+   <wvobject fp_name="/arbiter_tb/clk" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/arbiter_tb/reset" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/arbiter_tb/n_ctrlflg" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">n_ctrlflg</obj_property>
+      <obj_property name="ObjectShortName">n_ctrlflg</obj_property>
+   </wvobject>
+   <wvobject fp_name="/arbiter_tb/e_ctrlflg" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">e_ctrlflg</obj_property>
+      <obj_property name="ObjectShortName">e_ctrlflg</obj_property>
+   </wvobject>
+   <wvobject fp_name="/arbiter_tb/s_ctrlflg" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">s_ctrlflg</obj_property>
+      <obj_property name="ObjectShortName">s_ctrlflg</obj_property>
+   </wvobject>
+   <wvobject fp_name="/arbiter_tb/w_ctrlflg" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">w_ctrlflg</obj_property>
+      <obj_property name="ObjectShortName">w_ctrlflg</obj_property>
+   </wvobject>
+   <wvobject fp_name="/arbiter_tb/n_rnactrl" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">n_rnactrl[39:0]</obj_property>
+      <obj_property name="ObjectShortName">n_rnactrl[39:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/arbiter_tb/e_rnactrl" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">e_rnactrl[39:0]</obj_property>
+      <obj_property name="ObjectShortName">e_rnactrl[39:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/arbiter_tb/s_rnactrl" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">s_rnactrl[39:0]</obj_property>
+      <obj_property name="ObjectShortName">s_rnactrl[39:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/arbiter_tb/w_rnactrl" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">w_rnactrl[39:0]</obj_property>
+      <obj_property name="ObjectShortName">w_rnactrl[39:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/arbiter_tb/n_ctrflg" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">n_ctrflg</obj_property>
+      <obj_property name="ObjectShortName">n_ctrflg</obj_property>
+   </wvobject>
+   <wvobject fp_name="/arbiter_tb/e_ctrflg" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">e_ctrflg</obj_property>
+      <obj_property name="ObjectShortName">e_ctrflg</obj_property>
+   </wvobject>
+   <wvobject fp_name="/arbiter_tb/s_ctrflg" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">s_ctrflg</obj_property>
+      <obj_property name="ObjectShortName">s_ctrflg</obj_property>
+   </wvobject>
+   <wvobject fp_name="/arbiter_tb/w_ctrflg" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">w_ctrflg</obj_property>
+      <obj_property name="ObjectShortName">w_ctrflg</obj_property>
+   </wvobject>
+   <wvobject fp_name="/arbiter_tb/rna_ctrlpkt" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">rna_ctrlpkt[39:0]</obj_property>
+      <obj_property name="ObjectShortName">rna_ctrlpkt[39:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/arbiter_tb/clk_period" type="other" db_ref_id="1">
+      <obj_property name="ElementShortName">clk_period</obj_property>
+      <obj_property name="ObjectShortName">clk_period</obj_property>
+   </wvobject>
+   <wvobject fp_name="/arbiter_tb/uut/Control/start" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">start</obj_property>
+      <obj_property name="ObjectShortName">start</obj_property>
+   </wvobject>
+   <wvobject fp_name="/arbiter_tb/uut/Control/sch_data_in" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">sch_data_in[3:0]</obj_property>
+      <obj_property name="ObjectShortName">sch_data_in[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/arbiter_tb/uut/Control/address" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">address[3:0]</obj_property>
+      <obj_property name="ObjectShortName">address[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/arbiter_tb/uut/Control/r_address" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">r_address[3:0]</obj_property>
+      <obj_property name="ObjectShortName">r_address[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/arbiter_tb/uut/Control/sch_en" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">sch_en</obj_property>
+      <obj_property name="ObjectShortName">sch_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/arbiter_tb/uut/Control/rw" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">rw</obj_property>
+      <obj_property name="ObjectShortName">rw</obj_property>
+   </wvobject>
+   <wvobject fp_name="/arbiter_tb/uut/Control/expires_in" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">expires_in[3:0]</obj_property>
+      <obj_property name="ObjectShortName">expires_in[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/arbiter_tb/uut/Control/reserved_cnt" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">reserved_cnt[3:0]</obj_property>
+      <obj_property name="ObjectShortName">reserved_cnt[3:0]</obj_property>
+   </wvobject>
+</wave_config>

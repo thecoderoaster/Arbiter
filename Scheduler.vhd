@@ -47,26 +47,24 @@ end Scheduler;
 
 architecture Behavioral of Scheduler is
 	type schedule_type is array(0 to 2**address_size-1) of
-		std_logic_vector(address_size-1 downto 0);
+		std_logic_vector(word_size-1 downto 0);
 	signal schedule: schedule_type := 
-	( "0000",
-	  "0000",
-	  "0000",
-	  "0000",
-	  "0000",
-	  "0000",
-	  "0000",
-	  "0000",
-	  "0000",
-	  "0000",
-	  "0000",
-	  "0000",
-	  "0000",
-	  "0000",
-	  "0000",
-	  "0000");
---	  signal w_address 		: std_logic_vector(address_size-1 downto 0) := "0000";
---	  signal r_address		: std_logic_vector(address_size-1 downto 0) := "0000";
+	( "00000000000000000000000000000000",
+	  "00000000000000000000000000000000",
+	  "00000000000000000000000000000000",
+	  "00000000000000000000000000000000",
+	  "00000000000000000000000000000000",
+	  "00000000000000000000000000000000",
+	  "00000000000000000000000000000000",
+	  "00000000000000000000000000000000",
+	  "00000000000000000000000000000000",
+	  "00000000000000000000000000000000",
+	  "00000000000000000000000000000000",
+	  "00000000000000000000000000000000",
+	  "00000000000000000000000000000000",
+	  "00000000000000000000000000000000",
+	  "00000000000000000000000000000000",
+	  "00000000000000000000000000000000");
 begin
 
 	--main process:		Stores and Loads memory values based on address
@@ -83,7 +81,7 @@ begin
 				schedule(conv_integer(addr)) <= d;
 
 			else
-				q <= "ZZZZ";
+				q <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
 			end if;
 			
 	end process;

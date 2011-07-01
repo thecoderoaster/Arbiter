@@ -34,15 +34,16 @@ use work.router_library.all;
 
 entity ControlUnit is
 	generic(rsv_size		: natural;
-			  word_size 	: natural;
-			  address_size	: natural);
+			  address_size : natural;
+			  pid_size 		: natural;
+			  tid_size		: natural);
 	port(
 			clk				   : in std_logic;
 			rst					: in std_logic;
-			ram_data_in			: in std_logic_vector (word_size-1 downto 0);
-			ram_data_out		: out std_logic_vector (word_size-1 downto 0);
-			sch_data_in			: in std_logic_vector(address_size-1 downto 0);
-			sch_data_out		: out std_logic_vector(address_size-1 downto 0);
+			ram_data_in			: in std_logic_vector (pid_size-1 downto 0);
+			ram_data_out		: out std_logic_vector (pid_size-1 downto 0);
+			sch_data_in			: in std_logic_vector(tid_size-1 downto 0);
+			sch_data_out		: out std_logic_vector(tid_size-1 downto 0);
 			address				: out std_logic_vector (address_size-1 downto 0);
 			rw						: out std_logic;
 			ram_en				: out std_logic;
@@ -67,15 +68,17 @@ architecture Behavioral of ControlUnit is
 	type state_type is (start, north, east, south, west, check1, check2);
 	signal state, next_state : state_type;
 	
-	signal pid_packet 	: std_logic_vector(word_size-1 downto 0);
-	signal tid_packet		: std_logic_vector(address_size-1 downto 0);
-	signal timeunit 		: std_logic_vector(15 downto 0) := "0000000000000000";
-	signal counter 		: std_logic_vector(address_size-1 downto 0) := "0000";
+	signal pid_packet 	: std_logic_vector(pid_size-1 downto 0) := "0000000000000000";
+	signal tid_packet		: std_logic_vector(tid_size-1 downto 0) := "00000000000000000000000000000000";
+	signal globaltime		: std_logic_vector(31 downto 0) := "00000000000000000000000000000000";
+	signal counter 		: std_logic_vector(tid_size-1 downto 0) := "00000000000000000000000000000000";
+	signal expires_in		: std_logic_vector(tid_size-1 downto 0) := "00000000000000000000000000000000";
+	signal timeunit1 		: std_logic_vector(15 downto 0) := "0000000000000000";
+	signal timeunit2 		: std_logic_vector(15 downto 0) := "0000000000000000";
 	signal w_address 		: std_logic_vector(address_size-1 downto 0) := "0000";
 	signal r_address		: std_logic_vector(address_size-1 downto 0) := "0000";
 	signal reserved_cnt	: std_logic_vector(address_size-1 downto 0) := "0000";
-	signal expires_in		: std_logic_vector(address_size-1 downto 0) := "0000";
-	signal next_pid		: std_logic_vector(word_size-1 downto 0) := "0000000000000000";
+	signal next_pid		: std_logic_vector(pid_size-1 downto 0) := "0000000000000000";
 	signal start_timer 	: std_logic := '0';
 	signal time_expired  : std_logic := '0';
 	signal departure		: std_logic := '0';
@@ -86,27 +89,45 @@ architecture Behavioral of ControlUnit is
 	
 begin
 
+	--globaltimer_process: This is the running timer (indefinitely)
+	globaltimer_process: process(clk, rst)
+	begin
+		
+		if rst = '1' then
+			globaltime <= "00000000000000000000000000000000";
+			timeunit1 <= "0000000000000000" after 1 ns;
+		
+		elsif rising_edge(clk) then
+			timeunit1 <= timeunit1 + "0000000000000001";
+			if(timeunit1 = "000000111110") then
+				globaltime <= globaltime + "00000000000000000000000000000001";
+				timeunit1 <= "0000000000000000";
+			end if;
+		end if;
+	end process;
+
+
 	--timebase_process: 	Creates a "stopwatch" for establishing a timebase that
 	--							the packet transfers process requires to ensure QoS.
 	timebase_process: process(clk, rst)
 	begin
 	
 		if rst = '1' then
-			counter <= "0000";
+			counter <= "00000000000000000000000000000000";
 			time_expired <= '0';
-			timeunit <= "0000000000000000" after 1 ns;
+			timeunit2 <= "0000000000000000" after 1 ns;
 			
 		elsif rising_edge(clk) then
 			if(start_timer = '1' and time_expired = '0') then
-				timeunit <= timeunit + "0000000000000001";
+				timeunit2 <= timeunit2 + "0000000000000001";
 				time_expired <= '0';
-				if(timeunit = "000000111110") then						-- 1000 cycles
-					counter <= counter + "0001";							--increment the counter by 1 tick
+				if(timeunit2 = "0000000000000110") then								-- was 1000 cycles 0000000000111110
+					counter <= counter + "00000000000000000000000000000001";		--increment the counter by 1 tick
 					if(counter = expires_in) then
-						counter <= "0000";
+						counter <= "00000000000000000000000000000000";
 						time_expired <= '1';
 					end if;
-					timeunit <= "0000000000000000";
+					timeunit2 <= "0000000000000000";
 				end if;
 			elsif(start_timer = '0' and time_expired = '1') then
 				time_expired <= '0';
@@ -133,9 +154,9 @@ begin
 					--Ack!
 					n_CTRflg <= '1', '0' after 1 ns;
 					--Write bits to pid_packet
-					pid_packet <= n_rnaCtrl(19 downto 4);
+					pid_packet <= n_rnaCtrl(15 downto 0);
 					--Write bits to tid_packet
-					tid_packet <= n_rnaCtrl(3 downto 0);
+					tid_packet <= globaltime + n_rnaCtrl(rsv_size-1 downto 16);
 					--Send to memory
 					strobe_w <= '1', '0' after 1 ns;
 				end if;
@@ -146,9 +167,9 @@ begin
 					--Ack!
 					e_CTRflg <= '1', '0' after 1 ns;
 					--Write bits to pid_packet
-					pid_packet <= e_rnaCtrl(19 downto 4);
+					pid_packet <= e_rnaCtrl(15 downto 0);
 					--Write bits to tid_packet
-					tid_packet <= e_rnaCtrl(3 downto 0);
+					tid_packet <= globaltime + e_rnaCtrl(rsv_size-1 downto 16);
 					--Send to memory
 					strobe_w <= '1', '0' after 1 ns;
 				end if;
@@ -159,9 +180,9 @@ begin
 					--Ack!
 					s_CTRflg <= '1', '0' after 1 ns;
 					--Write bits to pid_packet
-					pid_packet <= s_rnaCtrl(19 downto 4);
+					pid_packet <= s_rnaCtrl(15 downto 0);
 					--Write bits to tid_packet
-					tid_packet <= s_rnaCtrl(3 downto 0);
+					tid_packet <= globaltime + s_rnaCtrl(rsv_size-1 downto 16);
 					--Send to memory
 					strobe_w <= '1', '0' after 1 ns;
 				end if;
@@ -172,9 +193,9 @@ begin
 					--Ack!
 					w_CTRflg <= '1', '0' after 1 ns;
 					--Write bits to pid_packet
-					pid_packet <= w_rnaCtrl(19 downto 4);
+					pid_packet <= w_rnaCtrl(15 downto 0);
 					--Write bits to tid_packet
-					tid_packet <= w_rnaCtrl(3 downto 0);
+					tid_packet <= globaltime + w_rnaCtrl(rsv_size-1 downto 16);
 					--Send to memory
 					strobe_w <= '1', '0' after 1 ns;
 				end if;

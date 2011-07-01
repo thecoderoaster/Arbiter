@@ -12,10 +12,11 @@ use ieee.std_logic_unsigned.all;
 package router_library is
 	--Universal constants Go Here (these are things that determine dimensions and can be changed on the fly)
 	constant WIDTH		: integer := 31;
-	constant RSV_WIDTH: integer := 40;
+	constant RSV_WIDTH: integer := 48;
 	constant PID_WIDTH: integer := 16;
+	constant TID_WIDTH: integer := 32;
 	constant SIZE		: integer := 10;
-	constant LUT_SIZE : integer := 15;			--16 entries
+	constant LUT_SIZE : integer := 15;				--16 entries
 	constant ADDR_WIDTH	: integer := 4;			--2^4 = (3 downto 0) possible entries (16)
 	
 	--Buffer Status Codes Go Here
@@ -40,6 +41,6 @@ package router_library is
 	type	t_ram8		is array (0 to LUT_SIZE) of std_logic_vector(7 downto 0);
 	type	t_ram16		is array (0 to LUT_SIZE) of std_logic_vector(15 downto 0);
 	type	t_ram32		is array (0 to LUT_SIZE) of std_logic_vector(31 downto 0);
-	type  t_ram40		is array (0 to LUT_SIZE) of std_logic_vector(39 downto 0);
+	type  t_ram40		is array (0 to LUT_SIZE) of std_logic_vector(RSV_WIDTH-1 downto 0);
 	
 end router_library;

@@ -314,11 +314,11 @@ BEGIN
 --		w_dSel <= "000";
 --		ejct_dSel <= "000";											
 --
-		n_rnaCtrl <= "0000000000000000000000000000000000000000";
-		e_rnaCtrl <= "0000000000000000000000000000000000000000";
-		s_rnaCtrl <= "0000000000000000000000000000000000000000";
-		w_rnaCtrl <= "0000000000000000000000000000000000000000";
-		rna_ctrlPkt <= "0000000000000000000000000000000000000000";
+		n_rnaCtrl <= "000000000000000000000000000000000000000000000000";
+		e_rnaCtrl <= "000000000000000000000000000000000000000000000000";
+		s_rnaCtrl <= "000000000000000000000000000000000000000000000000";
+		w_rnaCtrl <= "000000000000000000000000000000000000000000000000";
+		rna_ctrlPkt <= "000000000000000000000000000000000000000000000000";
 		n_CtrlFlg <= '0';
 		e_CtrlFlg <= '0';
 		s_CtrlFlg <= '0';
@@ -333,99 +333,15 @@ BEGIN
 		wait for clk_period*10;			
 	
 		-- insert stimulus here
-		n_rnaCtrl <= "0000000010101010000000000000000000001111";	--PID : 15
+		n_rnaCtrl <= "000000000000000000000000100000010000000100001111";	--GID : 15    PID : 1
 		n_CtrlFlg <= '1';
---		n_CtrlFlg <= '0' after 1 us;
-		e_rnaCtrl <= "1111010101101010100100111111000001001010";	--PID : 10
+		e_rnaCtrl <= "000000000000000000000100000000110000001000001111";	--GID : 15    PID : 2
 		e_CtrlFlg <= '1';
---		e_CtrlFlg <= '0' after 1 us;
-		w_rnaCtrl <= "1111010101101010100100111111000001100110";	--PID : 6
+		w_rnaCtrl <= "000000000000000000000000010000010000001000000110";	--GID : 6     PID : 1
 		w_CtrlFlg <= '1';
---		w_CtrlFlg <= '0' after 1 us;
-		s_rnaCtrl <= "1111010101101010100100111111000010011001";	--PID:  9
+		s_rnaCtrl <= "000000010000000000000000000010000000001000001001";	--GID:  9     PID : 1
 		s_CtrlFlg <= '1';
---		s_CtrlFlg <= '0' after 1 us;
 		wait for 1 us;
-		
---		n_rnaCtrl <= "1111010101101010100000000000000000011011";	--PID : 11
---		n_CtrlFlg <= '1';
---		n_CtrlFlg <= '0' after 1 us;
---		wait for 1 us;
---		e_rnaCtrl <= "1111010101101010100100111111000000100010";	--PID : 2
---		e_CtrlFlg <= '1';
---		e_CtrlFlg <= '0' after 1 us;
---		wait for 1 us;
---		n_rnaCtrl <= "1111010101101010100100111111000000110011";	--PID : 3
---		n_CtrlFlg <= '1';
---		n_CtrlFlg <= '0' after 1 us;
---		w_rnaCtrl <= "1111010101101010100100111111000001100110";	--PID : 6
---		w_CtrlFlg <= '1';
---		w_CtrlFlg <= '0' after 1 us;
---		s_rnaCtrl <= "1111010101101010100100111111000010011001";	--PID:  9
---		s_CtrlFlg <= '1';
---		s_CtrlFlg <= '0' after 1 us;
---		wait for 1 us;
---		n_rnaCtrl <= "1111010101101010100100111111000000110011";	--PID : 3
---		n_CtrlFlg <= '1';
---		n_CtrlFlg <= '0' after 1 us;
---		wait for 1 us;
---		e_rnaCtrl <= "1111010101101010100100111111000001001010";	--PID : 10
---		e_CtrlFlg <= '1';
---		e_CtrlFlg <= '0' after 1 us;
---		wait for 1 us;
---		e_rnaCtrl <= "1111010101101010100100111111000001011110";  --PID : 14
---		e_CtrlFlg <= '1';
---		e_CtrlFlg <= '0' after 1 us;
---		wait for 1 us;
---		n_rnaCtrl <= "1111010101101010100100111111000001100110";	--PID : 6
---		n_CtrlFlg <= '1';
---		n_CtrlFlg <= '0' after 1 us;
---		wait for 1 us;
---		n_rnaCtrl <= "1111010101101010100100111111000001110111";	--PID:  7
---		n_CtrlFlg <= '1';
---		n_CtrlFlg <= '0' after 1 us;
---		wait for 1 us;
---		n_rnaCtrl <= "1111010101101010100100111111000010001000";	--PID:  8
---		n_CtrlFlg <= '1';
---		n_CtrlFlg <= '0' after 1 us;
---		wait for 1 us;
---		e_rnaCtrl <= "1111010101101010100100111111000010011001";	--PID:  9
---		e_CtrlFlg <= '1';
---		e_CtrlFlg <= '0' after 1 us;
---		wait for 1 us;
---		n_rnaCtrl <= "1111010101101010100100111111000010101100";	--PID: 12
---		n_CtrlFlg <= '1';
---		n_CtrlFlg <= '0' after 1 us;
---		wait for 1 us;
---		e_rnaCtrl <= "1111010101101010100100111111000010111101";	--PID: 13
---		e_CtrlFlg <= '1';
---		e_CtrlFlg <= '0' after 1 us;
---		wait for 1 us;
---		e_rnaCtrl <= "1111010101101010100100111111000011000000";	--PID: 0
---		e_CtrlFlg <= '1';
---		e_CtrlFlg <= '0' after 1 us;
---		wait for 1 us;
---		n_rnaCtrl <= "1111010101101010100100111111000011010100";	--PID:  4
---		n_CtrlFlg <= '1';
---		n_CtrlFlg <= '0' after 1 us;
---		s_rnaCtrl <= "1111010101101010100100111111000011110001";	--PID: 1
---		s_CtrlFlg <= '1';
---		s_CtrlFlg <= '0' after 1 us;
---		w_rnaCtrl <= "1111010101101010100100111111000011110001";	--PID: 1
---		w_CtrlFlg <= '1';
---		w_CtrlFlg <= '0' after 1 us;
---		wait for 1 us;
---		e_rnaCtrl <= "1111010101101010100100111111000011100101"; 	--PID:  5
---		e_CtrlFlg <= '1';
---		e_CtrlFlg <= '0' after 1 us;
---		wait for 1 us;
---		e_rnaCtrl <= "1111010101101010100100111111000011110001";	--PID: 1
---		e_CtrlFlg <= '1';
---		e_CtrlFlg <= '0' after 1 us;
---		wait for 1 us;
---		n_rnaCtrl <= "1111010101101010100100111111111111110000";	--PID: 0
---		n_CtrlFlg <= '1';
---		n_CtrlFlg <= '0' after 1 us;
 			
       wait;
    end process;
