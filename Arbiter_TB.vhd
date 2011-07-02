@@ -111,9 +111,9 @@ ARCHITECTURE behavior OF Arbiter_TB IS
 --				w_dSel 				: out std_logic_vector (2 downto 0);
 --				ejct_dSel			: out std_logic_vector (2 downto 0);											
 --
-				rna_ctrlPkt			: out std_logic_vector (RSV_WIDTH-1 downto 0)		-- Control packet generator output
+				rna_ctrlPkt			: out std_logic_vector (RSV_WIDTH-1 downto 0);		-- Control packet generator output
 --				
---				injt_ctrlPkt		: in std_logic_vector (WIDTH downto 0)		-- Control packet from PE	
+				injt_ctrlPkt		: in std_logic_vector (RSV_WIDTH-1 downto 0)		-- Control packet from PE	
         );
     END COMPONENT;
     
@@ -133,7 +133,7 @@ ARCHITECTURE behavior OF Arbiter_TB IS
 	signal e_rnaCtrl :  std_logic_vector(RSV_WIDTH-1 downto 0);
 	signal s_rnaCtrl :  std_logic_vector(RSV_WIDTH-1 downto 0);
 	signal w_rnaCtrl :  std_logic_vector(RSV_WIDTH-1 downto 0);
---	signal injt_ctrlPkt :  std_logic_vector (RSV_WIDTH downto 0);		
+	signal injt_ctrlPkt :  std_logic_vector (RSV_WIDTH-1 downto 0);		
 
  	--Outputs
 --	signal n_vc_fStatSel		:  std_logic_vector (1 downto 0);
@@ -206,7 +206,7 @@ BEGIN
           e_rnaCtrl => e_rnaCtrl,
           s_rnaCtrl => s_rnaCtrl,
           w_rnaCtrl => w_rnaCtrl,
---          injt_ctrlPkt => injt_ctrlPkt,
+          injt_ctrlPkt => injt_ctrlPkt,
 --          n_vc_fStatSel => n_vc_fStatSel,
 --          n_vc_enqSel => n_vc_enqSel,
 --          n_vc_statSel => n_vc_statSel,
@@ -319,6 +319,7 @@ BEGIN
 		s_rnaCtrl <= "000000000000000000000000000000000000000000000000";
 		w_rnaCtrl <= "000000000000000000000000000000000000000000000000";
 		rna_ctrlPkt <= "000000000000000000000000000000000000000000000000";
+		injt_ctrlPkt <= "000000000000000000000000000000000000000000000000";
 		n_CtrlFlg <= '0';
 		e_CtrlFlg <= '0';
 		s_CtrlFlg <= '0';
@@ -333,14 +334,15 @@ BEGIN
 		wait for clk_period*10;			
 	
 		-- insert stimulus here
-		n_rnaCtrl <= "000000000000000000000000100000010000000100001111";	--GID : 15    PID : 1
+		n_rnaCtrl <= "000000000000000000000000100000010000000100001111";	 --GID : 15    PID : 1
 		n_CtrlFlg <= '1';
-		e_rnaCtrl <= "000000000000000000000100000000110000001000001111";	--GID : 15    PID : 2
+		e_rnaCtrl <= "000000000000000000000100000000110000001000001111";	 --GID : 15    PID : 2
 		e_CtrlFlg <= '1';
-		w_rnaCtrl <= "000000000000000000000000010000010000001000000110";	--GID : 6     PID : 1
+		w_rnaCtrl <= "000000000000000000000000010000010000001000000110";	 --GID : 6     PID : 1
 		w_CtrlFlg <= '1';
-		s_rnaCtrl <= "000000010000000000000000000010000000001000001001";	--GID:  9     PID : 1
+		s_rnaCtrl <= "000000010000000000000000000010000000001000001001";	 --GID:  9     PID : 1
 		s_CtrlFlg <= '1';
+		injt_ctrlPkt <= "000000000000000000000000010010000000001000000011"; -- GID: 3     PID : 1 
 		wait for 1 us;
 			
       wait;

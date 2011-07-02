@@ -60,7 +60,8 @@ entity ControlUnit is
 			w_CTRflg				: out std_logic;
 			w_CtrlFlg			: in std_logic;
 			w_rnaCtrl			: in std_logic_vector(rsv_size-1 downto 0);
-			rna_ctrlPkt			: out std_logic_vector(rsv_size-1 downto 0)
+			rna_ctrlPkt			: out std_logic_vector(rsv_size-1 downto 0);
+			injt_ctrlPkt		: in std_logic_vector (rsv_size-1 downto 0)
 		);
 end ControlUnit;
 
@@ -253,13 +254,25 @@ begin
 				if(time_expired = '1') then
 					start_timer <= '0';
 					--initiate departure
+					departure <= '1', '0' after 1 ns;
 				end if;
 			elsif(r_address = w_address and start_timer = '1') then
 				if(time_expired = '1') then
 					start_timer <= '0';
 					--initiate departure
+					departure <= '1', '0' after 1 ns;
 				end if;
 			end if;	
+		end if;
+	end process;
+	
+	--dpDeparture_process: This process is responsible for sending the next packet out.
+	dpDeparture_process: process(departure)
+	begin
+		if rising_edge(departure) then
+			--Grab PID/GID from next_pid signal
+			--Control VCC
+			--Set Switch to move packet
 		end if;
 	end process;
 end Behavioral;

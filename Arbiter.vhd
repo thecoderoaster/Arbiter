@@ -111,9 +111,9 @@ entity Arbiter is
 --				w_dSel 				: out std_logic_vector (2 downto 0);
 --				ejct_dSel			: out std_logic_vector (2 downto 0);											
 --
-				rna_ctrlPkt			: out std_logic_vector (RSV_WIDTH-1 downto 0)		-- Control packet generator output
+				rna_ctrlPkt			: out std_logic_vector (RSV_WIDTH-1 downto 0);		-- Control packet generator output
 --				
---				injt_ctrlPkt		: in std_logic_vector (WIDTH downto 0)
+				injt_ctrlPkt		: in std_logic_vector (RSV_WIDTH-1 downto 0)
 				);		-- Control packet from PE					
 
 end Arbiter;
@@ -173,7 +173,9 @@ architecture rtl of Arbiter is
 			w_CTRflg				: out std_logic;
 			w_CtrlFlg			: in std_logic;
 			w_rnaCtrl			: in std_logic_vector(rsv_size-1 downto 0);
-			rna_ctrlPkt			: out std_logic_vector(rsv_size-1 downto 0)
+			rna_ctrlPkt			: out std_logic_vector(rsv_size-1 downto 0);
+			injt_ctrlPkt		: in std_logic_vector (rsv_size-1 downto 0)
+
 		);
 	end component;
 
@@ -202,7 +204,7 @@ begin
 		generic map(RSV_WIDTH, ADDR_WIDTH, PID_WIDTH, TID_WIDTH)
 		port map(clk, reset, rt_data_out, rt_data_in, sh_data_out, sh_data_in, rt_address, rw, rt_en, sh_en, 
 					n_CTRFlg, n_CtrlFlg, n_rnaCtrl, e_CTRFlg, e_CtrlFlg, e_rnaCtrl, s_CTRFlg, s_CtrlFlg, s_rnaCtrl,
-					w_CTRFlg, w_CtrlFlg, w_rnaCtrl, rna_ctrlPkt);
+					w_CTRFlg, w_CtrlFlg, w_rnaCtrl, rna_ctrlPkt, injt_ctrlPkt);
 	
 	
 end rtl;
