@@ -1,4 +1,4 @@
-				----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
 -- Company: 
 -- Engineer: 
 -- 
@@ -48,6 +48,30 @@ entity ControlUnit is
 			rw						: out std_logic;
 			ram_en				: out std_logic;
 			sch_en				: out std_logic;
+			n_vc_deq 			: in  std_logic;
+			n_vc_rnaSelI 		: in  std_logic_vector (1 downto 0);		 
+			n_vc_rnaSelO 		: in  std_logic_vector (1 downto 0);		
+			n_vc_rnaSelS		: in	std_logic_vector (1 downto 0);		
+			n_vc_strq 			: in  std_logic;									
+			n_vc_status 		: out std_logic_vector (1 downto 0);		
+			e_vc_deq 			: in  std_logic;									
+			e_vc_rnaSelI 		: in  std_logic_vector (1 downto 0);		
+			e_vc_rnaSelO 		: in  std_logic_vector (1 downto 0);		 
+			e_vc_rnaSelS		: in	std_logic_vector (1 downto 0);
+			e_vc_strq 			: in  std_logic;
+			e_vc_status 		: out std_logic_vector (1 downto 0);
+			s_vc_deq 			: in  std_logic;							
+			s_vc_rnaSelI 		: in  std_logic_vector (1 downto 0); 
+			s_vc_rnaSelO 		: in  std_logic_vector (1 downto 0); 
+			s_vc_rnaSelS		: in	std_logic_vector (1 downto 0);
+			s_vc_strq 			: in  std_logic;							
+			s_vc_status 		: out std_logic_vector (1 downto 0);
+			w_vc_deq 			: in  std_logic;
+			w_vc_rnaSelI 		: in  std_logic_vector (1 downto 0); 
+			w_vc_rnaSelO 		: in  std_logic_vector (1 downto 0); 
+			w_vc_rnaSelS		: in	std_logic_vector (1 downto 0);
+			w_vc_strq 			: in  std_logic;
+			w_vc_status 		: out std_logic_vector (1 downto 0);
 			n_CTRflg				: out std_logic;
 			n_CtrlFlg			: in std_logic;
 			n_rnaCtrl			: in std_logic_vector(rsv_size-1 downto 0);
@@ -60,13 +84,19 @@ entity ControlUnit is
 			w_CTRflg				: out std_logic;
 			w_CtrlFlg			: in std_logic;
 			w_rnaCtrl			: in std_logic_vector(rsv_size-1 downto 0);
+			sw_nSel				: out std_logic_vector(2 downto 0);
+			sw_eSel				: out std_logic_vector(2 downto 0);
+			sw_sSel				: out std_logic_vector(2 downto 0);
+			sw_wSel				: out std_logic_vector(2 downto 0);
+			sw_ejectSel			: out std_logic_vector(2 downto 0);
+			sw_rnaCtFl			: in std_logic;
 			rna_ctrlPkt			: out std_logic_vector(rsv_size-1 downto 0);
 			injt_ctrlPkt		: in std_logic_vector (rsv_size-1 downto 0)
 		);
 end ControlUnit;
 
 architecture Behavioral of ControlUnit is
-	type state_type is (start, north, east, south, west, check1, check2);
+	type state_type is (start, north, east, south, west, injection, check1, check2);
 	signal state, next_state : state_type;
 	
 	signal pid_packet 	: std_logic_vector(pid_size-1 downto 0) := "0000000000000000";
@@ -160,6 +190,13 @@ begin
 					tid_packet <= globaltime + n_rnaCtrl(rsv_size-1 downto 16);
 					--Send to memory
 					strobe_w <= '1', '0' after 1 ns;
+					--Pass the packet
+					rna_ctrlPkt <= n_rnaCtrl;
+					sw_nSel <= "111";
+				elsif(n_CtrlFlg = '1' and table_full = '1') then
+					--Forward the packet
+					rna_ctrlPkt <= n_rnaCtrl;
+					sw_nSel <= "111";
 				end if;
 				next_state <= east;
 			when east =>
@@ -173,6 +210,13 @@ begin
 					tid_packet <= globaltime + e_rnaCtrl(rsv_size-1 downto 16);
 					--Send to memory
 					strobe_w <= '1', '0' after 1 ns;
+					--Pass the packet
+					rna_ctrlPkt <= e_rnaCtrl;
+					sw_eSel <= "111";
+				elsif(e_CtrlFlg = '1' and table_full = '1') then
+					--Forward the packet
+					rna_ctrlPkt <= e_rnaCtrl;
+					sw_eSel <= "111";
 				end if;
 				next_state <= south;
 			when south =>
@@ -186,6 +230,13 @@ begin
 					tid_packet <= globaltime + s_rnaCtrl(rsv_size-1 downto 16);
 					--Send to memory
 					strobe_w <= '1', '0' after 1 ns;
+					--Pass the packet
+					rna_ctrlPkt <= s_rnaCtrl;
+					sw_sSel <= "111";
+				elsif(s_CtrlFlg = '1' and table_full = '1') then
+					--Forward the packet
+					rna_ctrlPkt <= s_rnaCtrl;
+					sw_sSel <= "111";
 				end if;
 				next_state <= west;
 			when west =>
@@ -199,6 +250,31 @@ begin
 					tid_packet <= globaltime + w_rnaCtrl(rsv_size-1 downto 16);
 					--Send to memory
 					strobe_w <= '1', '0' after 1 ns;
+					--Pass the packet
+					rna_ctrlPkt <= w_rnaCtrl;
+					sw_wSel <= "111";
+				elsif(w_CtrlFlg = '1' and table_full = '1') then
+					--Forward the packet
+					rna_ctrlPkt <= w_rnaCtrl;
+					sw_wSel <= "111";
+				end if;
+				next_state <= injection;
+			when injection =>
+				--Check flag
+				if(sw_rnaCtFl = '1' and table_full = '0') then
+					--Write bits to pid_packet
+					pid_packet <= injt_ctrlPkt(15 downto 0);
+					--Write bits to tid_packet
+					tid_packet <= globaltime + injt_ctrlPkt(rsv_size-1 downto 16);
+					--Send to memory
+					strobe_w <= '1', '0' after 1 ns;
+					--Pass the packet
+					rna_ctrlPkt <= injt_ctrlPkt;
+					sw_nSel <= "101";
+				elsif(sw_rnaCtFl = '1' and table_full = '1') then
+					--Forward the packet
+					rna_ctrlPkt <= injt_ctrlPkt;
+					sw_nSel <= "101";
 				end if;
 				next_state <= check1;
 			when check1 =>
@@ -239,6 +315,8 @@ begin
 				reserved_cnt <= reserved_cnt + 1;
 				if(reserved_cnt = "1110") then
 					table_full <= '1';
+				else
+					table_full <= '0';
 				end if;
 			
 		elsif(strobe_r = '1') then

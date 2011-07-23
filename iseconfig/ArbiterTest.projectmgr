@@ -27,7 +27,7 @@
       <SelectedItems>
          <SelectedItem>View RTL Schematic</SelectedItem>
       </SelectedItems>
-      <ScrollbarPosition orientation="vertical" >10</ScrollbarPosition>
+      <ScrollbarPosition orientation="vertical" >0</ScrollbarPosition>
       <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
       <ViewHeaderState orientation="horizontal" >000000ff000000000000000100000001000000000000000000000000000000000000000000000000e7000000010000000100000000000000000000000064ffffffff000000810000000000000001000000e70000000100000000</ViewHeaderState>
       <UserChangedColumnWidths orientation="horizontal" >false</UserChangedColumnWidths>
@@ -78,13 +78,13 @@
          <ClosedNodesVersion>2</ClosedNodesVersion>
       </ClosedNodes>
       <SelectedItems>
-         <SelectedItem>Arbiter_TB - behavior (C:/Users/kor/Documents/ArbiterTest/Arbiter_TB.vhd)</SelectedItem>
+         <SelectedItem>Control - ControlUnit - Behavioral (C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd)</SelectedItem>
       </SelectedItems>
       <ScrollbarPosition orientation="vertical" >0</ScrollbarPosition>
       <ScrollbarPosition orientation="horizontal" >0</ScrollbarPosition>
       <ViewHeaderState orientation="horizontal" >000000ff000000000000000100000001000000000000000000000000000000000202000000010000000100000064000001a3000000020000000000000000000000000000000064ffffffff000000810000000000000002000001a30000000100000000000000000000000100000000</ViewHeaderState>
       <UserChangedColumnWidths orientation="horizontal" >false</UserChangedColumnWidths>
-      <CurrentItem>Arbiter_TB - behavior (C:/Users/kor/Documents/ArbiterTest/Arbiter_TB.vhd)</CurrentItem>
+      <CurrentItem>Control - ControlUnit - Behavioral (C:/Users/kor/Documents/ArbiterTest/ControlUnit.vhd)</CurrentItem>
    </ItemView>
    <ItemView engineview="BehavioralSim" sourcetype="" guiview="Process" >
       <ClosedNodes>
