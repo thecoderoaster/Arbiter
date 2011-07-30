@@ -92,10 +92,10 @@ ARCHITECTURE behavior OF Arbiter_TB IS
 				w_CtrlFlg				: in std_logic;
 			
 				--Scheduler Related
-				n_rnaCtrl			: in std_logic_vector(RSV_WIDTH-1 downto 0);			-- Control Packet 
-				e_rnaCtrl			: in std_logic_vector(RSV_WIDTH-1 downto 0);
-				s_rnaCtrl			: in std_logic_vector(RSV_WIDTH-1 downto 0);
-				w_rnaCtrl			: in std_logic_vector(RSV_WIDTH-1 downto 0);
+				n_rnaCtrl			: in std_logic_vector(CP_WIDTH-1 downto 0);			-- Control Packet 
+				e_rnaCtrl			: in std_logic_vector(CP_WIDTH-1 downto 0);
+				s_rnaCtrl			: in std_logic_vector(CP_WIDTH-1 downto 0);
+				w_rnaCtrl			: in std_logic_vector(CP_WIDTH-1 downto 0);
 								
 				--Switch Related
 				sw_nSel				: out std_logic_vector(2 downto 0);
@@ -104,8 +104,8 @@ ARCHITECTURE behavior OF Arbiter_TB IS
 				sw_wSel				: out std_logic_vector(2 downto 0);
 				sw_ejectSel			: out std_logic_vector(2 downto 0);										
 				sw_rnaCtFl			: in std_logic;												-- Flag from Switch for injection packet
-				rna_ctrlPkt			: out std_logic_vector (RSV_WIDTH-1 downto 0);		-- Control packet generator output				
-				injt_ctrlPkt		: in std_logic_vector (RSV_WIDTH-1 downto 0)			-- coming from switch control packet from PE	
+				rna_ctrlPkt			: out std_logic_vector (CP_WIDTH-1 downto 0);		-- Control packet generator output				
+				injt_ctrlPkt		: in std_logic_vector (CP_WIDTH-1 downto 0)			-- coming from switch control packet from PE	
     );
     END COMPONENT;
     
@@ -117,10 +117,10 @@ ARCHITECTURE behavior OF Arbiter_TB IS
 	signal e_CtrlFlg :  std_logic := '0';										
 	signal s_CtrlFlg :  std_logic := '0';
 	signal w_CtrlFlg :  std_logic := '0';
-	signal n_rnaCtrl :  std_logic_vector(RSV_WIDTH-1 downto 0);
-	signal e_rnaCtrl :  std_logic_vector(RSV_WIDTH-1 downto 0);
-	signal s_rnaCtrl :  std_logic_vector(RSV_WIDTH-1 downto 0);
-	signal w_rnaCtrl :  std_logic_vector(RSV_WIDTH-1 downto 0);
+	signal n_rnaCtrl :  std_logic_vector(CP_WIDTH-1 downto 0);
+	signal e_rnaCtrl :  std_logic_vector(CP_WIDTH-1 downto 0);
+	signal s_rnaCtrl :  std_logic_vector(CP_WIDTH-1 downto 0);
+	signal w_rnaCtrl :  std_logic_vector(CP_WIDTH-1 downto 0);
 	
 	--Virtual Channels
 	signal n_vc_deq 			:  std_logic := '0';
@@ -169,8 +169,8 @@ ARCHITECTURE behavior OF Arbiter_TB IS
 	signal sw_ejectSel		: 	std_logic_vector(2 downto 0);										
 	signal sw_rnaCtFl			: 	std_logic;	
 
-	signal rna_ctrlPkt		:  std_logic_vector (RSV_WIDTH-1 downto 0);
-	signal injt_ctrlPkt 		:  std_logic_vector (RSV_WIDTH-1 downto 0);
+	signal rna_ctrlPkt		:  std_logic_vector (CP_WIDTH-1 downto 0);
+	signal injt_ctrlPkt 		:  std_logic_vector (CP_WIDTH-1 downto 0);
 	
    -- Clock period definitions 1MHz
    constant clk_period : time := 1us;
@@ -257,11 +257,11 @@ BEGIN
 		s_CtrlFlg <= '0';
 		w_CtrlFlg <= '0';
 	
-		n_rnaCtrl <= "000000000000000000000000000000000000000000000000";
-		e_rnaCtrl <= "000000000000000000000000000000000000000000000000";
-		s_rnaCtrl <= "000000000000000000000000000000000000000000000000";
-		w_rnaCtrl <= "000000000000000000000000000000000000000000000000";
-		injt_ctrlPkt <= "000000000000000000000000000000000000000000000000";
+		n_rnaCtrl <= "00000000000000000000000000000000000000000000000000000000000000";
+		e_rnaCtrl <= "00000000000000000000000000000000000000000000000000000000000000";
+		s_rnaCtrl <= "00000000000000000000000000000000000000000000000000000000000000";
+		w_rnaCtrl <= "00000000000000000000000000000000000000000000000000000000000000";
+		injt_ctrlPkt <= "00000000000000000000000000000000000000000000000000000000000000";
 		
 		--Initiate a Reset
 		reset <= '0';
@@ -270,19 +270,35 @@ BEGIN
 		wait for 1 ps;
 		reset <= '0';
 		
+		--PAYLOAD = 0x00000001 (ADDRESS) : GID = 0x01 : PID = 0x00 (PKT ID) : PATH = 0x00 : ADDR = 0x00 (CURRENT ADDRESS) : COND = 0x01
+		injt_ctrlPkt <= "00000000000000000000000000000001" & "00000001" & "00000001" & "000" & "00000000" & "01" & "0";
+		sw_rnaCtFl <= '1';
+		
 		--Wait 10 us before starting
 		wait for clk_period*10;			
-	
+
 		-- insert stimulus here
-		n_rnaCtrl <= "000000000000000000000000100000010000000100001111";	 --GID : 15    PID : 1
+		
+		--PAYLOAD = 25 Cycles (TID) : GID = 0x01 (SOURCE)	: PID = 0x01 (PKT ID) :	PATH = 0x001 (EAST) : ADDR = 0x01 (ROUTER ADDRESS) : COND = 0x00
+		n_rnaCtrl <= "00000000000000000000000000011001" & "00000001" & "00000001" & "001" & "00000001" & "00" & "0"; 
 		n_CtrlFlg <= '1';
-		e_rnaCtrl <= "000000000000000000000100000000110000001000001111";	 --GID : 15    PID : 2
+		
+		--PAYLOAD = 30 Cycles (TID) : GID = 0x01 (SOURCE)	: PID = 0x02 (PKT ID) :	PATH = 0x001 (EAST) : ADDR = 0x02 (ROUTER ADDRESS) : COND = 0x00
+		e_rnaCtrl <= "00000000000000000000000000011110" & "00000001" & "00000010" & "001" & "00000010" & "00" & "0";
 		e_CtrlFlg <= '1';
-		w_rnaCtrl <= "000000000000000000000000010000010000001000000110";	 --GID : 6     PID : 1
+		
+		--PAYLOAD = 35 Cycles (TID) : GID = 0x01 (SOURCE)	: PID = 0x03 (PKT ID) :	PATH = 0x010 (SOUTH) : ADDR = 0x03 (ROUTER ADDRESS) : COND = 0x00
+		w_rnaCtrl <= "00000000000000000000000000100110" & "00000001" & "00000011" & "010" & "00000011" & "00" & "0";
 		w_CtrlFlg <= '1';
-		s_rnaCtrl <= "000000000000000000000000000010000000001000001001";	 --GID:  9     PID : 1
+		
+		--PAYLOAD = 40 Cycles (TID) : GID = 0x01 (SOURCE)	: PID = 0x04 (PKT ID) :	PATH = 0x010 (SOUTH) : ADDR = 0x06 (ROUTER ADDRESS) : COND = 0x00
+		s_rnaCtrl <= "00000000000000000000000000101000" & "00000001" & "00000100" & "010" & "00000110" & "00" & "0";
 		s_CtrlFlg <= '1';
-		injt_ctrlPkt <= "000000000000000000000000010010000000001000000011"; -- GID: 3     PID : 1 
+		
+		--PAYLOAD = 0 Cycles (TID) : GID = 0x01 (SOURCE)	: PID = 0x05 (PKT ID) :	PATH = 0x111 (DEST.) : ADDR = 0x09 (ROUTER ADDRESS) : COND = 0x00
+		injt_ctrlPkt <= "00000000000000000000000000000000" & "00000001" & "00000101" & "111" & "00001001" & "00" & "0";
+		sw_rnaCtFl <= '1';
+		
 		wait for 1 us;
 			
       wait;

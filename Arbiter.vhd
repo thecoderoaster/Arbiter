@@ -94,10 +94,10 @@ entity Arbiter is
 				w_CtrlFlg				: in std_logic;
 			
 				--Scheduler Related
-				n_rnaCtrl			: in std_logic_vector(RSV_WIDTH-1 downto 0);			-- Control Packet 
-				e_rnaCtrl			: in std_logic_vector(RSV_WIDTH-1 downto 0);
-				s_rnaCtrl			: in std_logic_vector(RSV_WIDTH-1 downto 0);
-				w_rnaCtrl			: in std_logic_vector(RSV_WIDTH-1 downto 0);
+				n_rnaCtrl			: in std_logic_vector(CP_WIDTH-1 downto 0);			-- Control Packet 
+				e_rnaCtrl			: in std_logic_vector(CP_WIDTH-1 downto 0);
+				s_rnaCtrl			: in std_logic_vector(CP_WIDTH-1 downto 0);
+				w_rnaCtrl			: in std_logic_vector(CP_WIDTH-1 downto 0);
 								
 				--Switch Related
 				sw_nSel				: out std_logic_vector(2 downto 0);
@@ -106,14 +106,14 @@ entity Arbiter is
 				sw_wSel				: out std_logic_vector(2 downto 0);
 				sw_ejectSel			: out std_logic_vector(2 downto 0);										
 				sw_rnaCtFl			: in std_logic;												-- Flag from Switch for injection packet
-				rna_ctrlPkt			: out std_logic_vector (RSV_WIDTH-1 downto 0);		-- Control packet generator output				
-				injt_ctrlPkt		: in std_logic_vector (RSV_WIDTH-1 downto 0)			-- coming from switch control packet from PE	
+				rna_ctrlPkt			: out std_logic_vector (CP_WIDTH-1 downto 0);		-- Control packet generator output				
+				injt_ctrlPkt		: in std_logic_vector (CP_WIDTH-1 downto 0)			-- coming from switch control packet from PE	
 				);						
 
 end Arbiter;
 
 architecture rtl of Arbiter is
-	component RAMBlock
+	component ReservationTable
 	generic(word_size 	: natural;
 			  address_size	: natural);
    port (  d 			: in  std_logic_vector(word_size-1 downto 0);
@@ -126,7 +126,7 @@ architecture rtl of Arbiter is
 		   );
 	end component;
 	
-	component Scheduler
+	component RoutingTable
 	generic(word_size		: natural;
 			  address_size : natural);
 	port (  d 			: in  std_logic_vector(word_size-1 downto 0);
@@ -140,93 +140,93 @@ architecture rtl of Arbiter is
 	end component;
 	
 	component ControlUnit
-	generic(rsv_size		: natural;
+	generic(cp_size		: natural;
 			  address_size : natural;
-			  pid_size 		: natural;
-			  tid_size		: natural);
+			  rsv_size 		: natural;
+			  rte_size		: natural);
 	port(
 			clk				   : in std_logic;
 			rst					: in std_logic;
-			ram_data_in			: in std_logic_vector (pid_size-1 downto 0);
-			ram_data_out		: out std_logic_vector (pid_size-1 downto 0);
-			sch_data_in			: in std_logic_vector(tid_size-1 downto 0);
-			sch_data_out		: out std_logic_vector(tid_size-1 downto 0);
+			rsv_data_in			: in std_logic_vector (rsv_size-1 downto 0);
+			rsv_data_out		: out std_logic_vector (rsv_size-1 downto 0);
+			rte_data_in			: in std_logic_vector(rte_size-1 downto 0);
+			rte_data_out		: out std_logic_vector(rte_size-1 downto 0);
 			address				: out std_logic_vector (address_size-1 downto 0);
 			rw						: out std_logic;
-			ram_en				: out std_logic;
-			sch_en				: out std_logic;
+			rsv_en				: out std_logic;
+			rte_en				: out std_logic;
 			n_vc_deq 			: in  std_logic;
-			n_vc_rnaSelI 		: in  std_logic_vector (1 downto 0); 
-			n_vc_rnaSelO 		: in  std_logic_vector (1 downto 0); 
-			n_vc_rnaSelS		: in	std_logic_vector (1 downto 0);
-			n_vc_strq 			: in  std_logic;
-			n_vc_status 		: out std_logic_vector (1 downto 0);
-			e_vc_deq 			: in  std_logic;
-			e_vc_rnaSelI 		: in  std_logic_vector (1 downto 0); 
-			e_vc_rnaSelO 		: in  std_logic_vector (1 downto 0);
+			n_vc_rnaSelI 		: in  std_logic_vector (1 downto 0);		 
+			n_vc_rnaSelO 		: in  std_logic_vector (1 downto 0);		
+			n_vc_rnaSelS		: in	std_logic_vector (1 downto 0);		
+			n_vc_strq 			: in  std_logic;									
+			n_vc_status 		: out std_logic_vector (1 downto 0);		
+			e_vc_deq 			: in  std_logic;									
+			e_vc_rnaSelI 		: in  std_logic_vector (1 downto 0);		
+			e_vc_rnaSelO 		: in  std_logic_vector (1 downto 0);		 
 			e_vc_rnaSelS		: in	std_logic_vector (1 downto 0);
 			e_vc_strq 			: in  std_logic;
 			e_vc_status 		: out std_logic_vector (1 downto 0);
-			s_vc_deq 			: in  std_logic;
+			s_vc_deq 			: in  std_logic;							
 			s_vc_rnaSelI 		: in  std_logic_vector (1 downto 0); 
-			s_vc_rnaSelO 		: in  std_logic_vector (1 downto 0);
+			s_vc_rnaSelO 		: in  std_logic_vector (1 downto 0); 
 			s_vc_rnaSelS		: in	std_logic_vector (1 downto 0);
-			s_vc_strq 			: in  std_logic;
+			s_vc_strq 			: in  std_logic;							
 			s_vc_status 		: out std_logic_vector (1 downto 0);
 			w_vc_deq 			: in  std_logic;
-			w_vc_rnaSelI 		: in  std_logic_vector (1 downto 0);
-			w_vc_rnaSelO 		: in  std_logic_vector (1 downto 0);
+			w_vc_rnaSelI 		: in  std_logic_vector (1 downto 0); 
+			w_vc_rnaSelO 		: in  std_logic_vector (1 downto 0); 
 			w_vc_rnaSelS		: in	std_logic_vector (1 downto 0);
-			w_vc_strq 			: in  std_logic;							
+			w_vc_strq 			: in  std_logic;
 			w_vc_status 		: out std_logic_vector (1 downto 0);
 			n_CTRflg				: out std_logic;
 			n_CtrlFlg			: in std_logic;
-			n_rnaCtrl			: in std_logic_vector(rsv_size-1 downto 0);
+			n_rnaCtrl			: in std_logic_vector(cp_size-1 downto 0);
 			e_CTRflg				: out std_logic;
 			e_CtrlFlg			: in std_logic;
-			e_rnaCtrl			: in std_logic_vector(rsv_size-1 downto 0);
+			e_rnaCtrl			: in std_logic_vector(cp_size-1 downto 0);
 			s_CTRflg				: out std_logic;
 			s_CtrlFlg			: in std_logic;
-			s_rnaCtrl			: in std_logic_vector(rsv_size-1 downto 0);
+			s_rnaCtrl			: in std_logic_vector(cp_size-1 downto 0);
 			w_CTRflg				: out std_logic;
 			w_CtrlFlg			: in std_logic;
-			w_rnaCtrl			: in std_logic_vector(rsv_size-1 downto 0);
+			w_rnaCtrl			: in std_logic_vector(cp_size-1 downto 0);
 			sw_nSel				: out std_logic_vector(2 downto 0);
 			sw_eSel				: out std_logic_vector(2 downto 0);
 			sw_sSel				: out std_logic_vector(2 downto 0);
 			sw_wSel				: out std_logic_vector(2 downto 0);
 			sw_ejectSel			: out std_logic_vector(2 downto 0);
-			sw_rnaCtFl			: in std_logic;			
-			rna_ctrlPkt			: out std_logic_vector(rsv_size-1 downto 0);
-			injt_ctrlPkt		: in std_logic_vector (rsv_size-1 downto 0)
+			sw_rnaCtFl			: in std_logic;
+			rna_ctrlPkt			: out std_logic_vector(cp_size-1 downto 0);
+			injt_ctrlPkt		: in std_logic_vector (cp_size-1 downto 0)
 
 		);
 	end component;
 
 	--RoutingTable Related
-	signal rt_data_in				: std_logic_vector (PID_WIDTH-1 downto 0);
-	signal rt_data_out			: std_logic_vector (PID_WIDTH-1 downto 0);
-	signal rt_en					: std_logic;
-	signal sh_data_in				: std_logic_vector (TID_WIDTH-1 downto 0);
-	signal sh_data_out			: std_logic_vector (TID_WIDTH-1 downto 0);
-	signal sh_en					: std_logic;
-	signal rt_address				: std_logic_vector (ADDR_WIDTH-1 downto 0);
+	signal rsv_data_in			: std_logic_vector (RSV_WIDTH-1 downto 0);
+	signal rsv_data_out			: std_logic_vector (RSV_WIDTH-1 downto 0);
+	signal rsv_en					: std_logic;
+	signal rte_data_in			: std_logic_vector (RTE_WIDTH-1 downto 0);
+	signal rte_data_out			: std_logic_vector (RTE_WIDTH-1 downto 0);
+	signal rte_en					: std_logic;
+	signal address					: std_logic_vector (ADDR_WIDTH-1 downto 0);
 	signal rw						: std_logic;
 	
 	
 begin
 	
-	ReservationTable : RAMBlock
-		generic map (PID_WIDTH, ADDR_WIDTH)
-		port map (rt_data_in, reset, rt_address, clk, rw, rt_en, rt_data_out);
+	RsvTable : ReservationTable
+		generic map (RSV_WIDTH, ADDR_WIDTH)
+		port map (rsv_data_in, reset, address, clk, rw, rsv_en, rsv_data_out);
 	
-	SchedulerUnit: Scheduler
-		generic map (TID_WIDTH, ADDR_WIDTH)
-		port map(sh_data_in, reset, rt_address, clk, rw, sh_en, sh_data_out);
+	RteTable: RoutingTable
+		generic map (RTE_WIDTH, ADDR_WIDTH)
+		port map(rte_data_in, reset, address, clk, rw, rte_en, rte_data_out);
 	
 	Control	: ControlUnit
-		generic map(RSV_WIDTH, ADDR_WIDTH, PID_WIDTH, TID_WIDTH)
-		port map(clk, reset, rt_data_out, rt_data_in, sh_data_out, sh_data_in, rt_address, rw, rt_en, sh_en, 
+		generic map(CP_WIDTH, ADDR_WIDTH, RSV_WIDTH, RTE_WIDTH)
+		port map(clk, reset, rsv_data_out, rsv_data_in, rte_data_out, rte_data_in, address, rw, rsv_en, rte_en, 
 					n_vc_deq, n_vc_rnaSelI, n_vc_rnaSelO, n_vc_rnaSelS, n_vc_strq, n_vc_status,
 					e_vc_deq, e_vc_rnaSelI, e_vc_rnaSelO, e_vc_rnaSelS, e_vc_strq, e_vc_status,
 					s_vc_deq, s_vc_rnaSelI, s_vc_rnaSelO, s_vc_rnaSelS, s_vc_strq, s_vc_status,
