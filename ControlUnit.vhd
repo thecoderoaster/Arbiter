@@ -72,6 +72,10 @@ entity ControlUnit is
 			w_vc_rnaSelS		: in	std_logic_vector (1 downto 0);
 			w_vc_strq 			: in  std_logic;
 			w_vc_status 		: out std_logic_vector (1 downto 0);
+			n_NeighborCTRflg	: in std_logic;
+			e_NeighborCTRflg	: in std_logic;
+			s_NeighborCTRflg	: in std_logic;
+			w_NeighborCTRflg	: in std_logic;
 			n_CTRflg				: out std_logic;
 			n_CtrlFlg			: in std_logic;
 			n_rnaCtrl			: in std_logic_vector(cp_size-1 downto 0);
@@ -96,14 +100,14 @@ entity ControlUnit is
 end ControlUnit;
 
 architecture Behavioral of ControlUnit is
-	type state_type is (start, north, east, south, west, injection, timer_check, dp_arrival);
+	type state_type is (start, north, east, south, west, injection, timer_check, dp_arrival1, 
+							  dp_arrival2, dp_arrival3, dp_arrival4);
 	signal state, next_state : state_type;
 	
 	signal router_address 	: std_logic_vector(PID_WIDTH-1 downto 0) := "00000000";
 	signal rsv_packet 		: std_logic_vector(rsv_size-1 downto 0) := "0000000000000000000";
 	signal rsv_packet_info 	: std_logic_vector(rsv_size-1 downto 0) := "0000000000000000000";
 	signal rte_packet			: std_logic_vector(rte_size-1 downto 0) := "0000000000000000000000000";
-	signal sch_packet			: std_logic_vector(SCH_WIDTH-1 downto 0) :=  "000000000000000000000000000000000000000000000000";
 	signal cp_packet			: std_logic_vector(cp_size-1 downto 0)	:= "00000000000000000000000000000000000000000000000000000000000000";
 	signal globaltime			: std_logic_vector(31 downto 0) := "00000000000000000000000000000000";
 	signal counter 			: std_logic_vector(31 downto 0) := "00000000000000000000000000000000";
@@ -129,7 +133,6 @@ architecture Behavioral of ControlUnit is
 	signal update_r			: std_logic := '0';
 	signal update_w			: std_logic := '0';
 	signal timer_control		: std_logic := '0';
-
 
 	
 begin
@@ -208,6 +211,29 @@ begin
 	  "000000000000000000000000000000000000000000000000",
 	  "000000000000000000000000000000000000000000000000",
 	  "000000000000000000000000000000000000000000000000");
+	  
+	type addresslut_type is array(0 to 2**address_size-1) of
+		std_logic_vector(15 downto 0);
+	variable address_lut: addresslut_type :=
+	( "0000000000000000",
+	  "0000000000000000",
+	  "0000000000000000",
+	  "0000000000000000",
+	  "0000000000000000",
+	  "0000000000000000",
+	  "0000000000000000",
+	  "0000000000000000",
+	  "0000000000000000",
+	  "0000000000000000",
+	  "0000000000000000",
+	  "0000000000000000",
+	  "0000000000000000",
+	  "0000000000000000",
+	  "0000000000000000",
+	  "0000000000000000");
+	  
+	variable sch_packet	: std_logic_vector(SCH_WIDTH-1 downto 0) :=  "000000000000000000000000000000000000000000000000";
+
 	begin
 		case state is
 			when start =>
@@ -223,6 +249,8 @@ begin
 							rsv_packet <= n_rnaCtrl(29 downto 11);
 							--Write bits to sch_packet
 							schedule(conv_integer(w_address)) := n_rnaCtrl(29 downto 14) & (globaltime + n_rnaCtrl(cp_size-1 downto 30));
+							--Store locally
+							address_lut(conv_integer(w_address)) := n_rnaCtrl(29 downto 14);
 							--Send to memory
 							rsv_strobe_w <= '1', '0' after 1 ns;
 						else
@@ -350,17 +378,50 @@ begin
 				--Check scheduled job and determine if departure is necessary.
 				if(r_address /= w_address and start_timer = '0') then
 					--Grab time from scheduler
-					sch_packet <= schedule(conv_integer(r_address));
-					expires_in <= sch_packet(31 downto 0) after 1 ns;
-					next_pkt <= sch_packet(47 downto 32) after 1 ns;
+					sch_packet := schedule(conv_integer(r_address));
+					expires_in <= sch_packet(31 downto 0);
+					next_pkt <= sch_packet(47 downto 32);
 					timer_control <= '1', '0' after 1 ns;
 				else
 					timer_control <= '1', '0' after 1 ns;
 				end if;
 				
-				next_state <= dp_arrival;
-			when dp_arrival =>
+				next_state <= dp_arrival1;
+			when dp_arrival1 =>
 				--Any new data packets?
+				if(n_NeighborCTRflg = '1') then
+					--for i in 0 to 15 loop
+						--Look for GID/PID 
+						--if()
+					--end loop;
+					rsv_strobe_r <= '1', '0' after 1 ns;
+				else
+					rsv_strobe_r <= '0';
+				end if;
+				next_state <= dp_arrival2;
+			when dp_arrival2 =>
+				--Any new data packets?
+				if(e_NeighborCTRflg = '1') then
+					rsv_strobe_r <= '1', '0' after 1 ns;
+				else
+					rsv_strobe_r <= '0';
+				end if;
+				next_state <= dp_arrival3;
+			when dp_arrival3 =>
+				--Any new data packets?
+				if(s_NeighborCTRflg = '1') then
+					rsv_strobe_r <= '1', '0' after 1 ns;
+				else
+					rsv_strobe_r <= '0';
+				end if;
+				next_state <= dp_arrival4;
+			when dp_arrival4 =>
+				--Any new data packets?
+				if(w_NeighborCTRflg = '1') then
+					rsv_strobe_r <= '1', '0' after 1 ns;
+				else
+					rsv_strobe_r <= '0';
+				end if;
 				next_state <= start;
 			when others =>
 				next_state <= start;
@@ -381,16 +442,12 @@ begin
 	
 		elsif rising_edge(rsv_strobe_r) then
 			--Read from Reservation Table
-			for i in 0 to 15 loop
-				address <= index;
-				rw <= '0';
-				rsv_en <= '1', '0' after 1 ns;
-				rsv_packet_info <= rsv_data_in;
-				index <= index + "0001" after 1 ns;
-			end loop;
-			
+			address <= index;
+			rw <= '0';
+			rsv_en <= '1', '0' after 1 ns;
+			rsv_packet_info <= rsv_data_in;
+		
 			arrival <= '1', '0' after 1 ns;
-			index <= "0000" after 1 ns;
 			
 		end if;
 	end process;

@@ -179,6 +179,10 @@ architecture rtl of Arbiter is
 			w_vc_rnaSelS		: in	std_logic_vector (1 downto 0);
 			w_vc_strq 			: in  std_logic;
 			w_vc_status 		: out std_logic_vector (1 downto 0);
+			n_NeighborCTRflg	: in std_logic; 
+			e_NeighborCTRflg	: in std_logic;						
+			s_NeighborCTRflg	: in std_logic;
+			w_NeighborCTRflg	: in std_logic;
 			n_CTRflg				: out std_logic;
 			n_CtrlFlg			: in std_logic;
 			n_rnaCtrl			: in std_logic_vector(cp_size-1 downto 0);
@@ -231,6 +235,7 @@ begin
 					e_vc_deq, e_vc_rnaSelI, e_vc_rnaSelO, e_vc_rnaSelS, e_vc_strq, e_vc_status,
 					s_vc_deq, s_vc_rnaSelI, s_vc_rnaSelO, s_vc_rnaSelS, s_vc_strq, s_vc_status,
 					w_vc_deq, w_vc_rnaSelI, w_vc_rnaSelO, w_vc_rnaSelS, w_vc_strq, w_vc_status,
+					n_NeighborCTRflg, e_NeighborCTRflg, s_NeighborCTRflg, w_NeighborCTRflg,
 					n_CTRFlg, n_CtrlFlg, n_rnaCtrl, e_CTRFlg, e_CtrlFlg, e_rnaCtrl, s_CTRFlg, s_CtrlFlg, s_rnaCtrl,
 					w_CTRFlg, w_CtrlFlg, w_rnaCtrl, sw_nSel, sw_eSel, sw_sSel, sw_wSel, sw_ejectSel, sw_rnaCtFl, 
 					rna_ctrlPkt, injt_ctrlPkt);

@@ -299,8 +299,11 @@ BEGIN
 		injt_ctrlPkt <= "00000000000000000000000000000000" & "00000001" & "00000101" & "111" & "00001001" & "00" & "0";
 		sw_rnaCtFl <= '1';
 		
-		wait for 1 us;
-			
+		wait for 10000 ms;
+		
+		n_NeighborCTRflg <= '1'; --, '0' after 1 ns;
+		
+		
       wait;
    end process;
 
