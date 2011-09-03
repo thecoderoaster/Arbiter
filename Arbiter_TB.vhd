@@ -45,34 +45,34 @@ ARCHITECTURE behavior OF Arbiter_TB IS
 				reset					: in std_logic;
 				
 				--Virtual Channel Related
-				n_vc_deq 			: in  	std_logic;									-- Dequeue latch input (from RNA) (dmuxed)
-				n_vc_rnaSelI 		: in  	std_logic_vector (1 downto 0);		-- FIFO select for input (from RNA) 
-				n_vc_rnaSelO 		: in  	std_logic_vector (1 downto 0);		-- FIFO select for output (from RNA) 
-				n_vc_rnaSelS		: in		std_logic_vector (1 downto 0);		-- FIFO select for status (from RNA)
-				n_vc_strq 			: in  	std_logic;									-- Status request (from RNA) (dmuxed)
-				n_vc_status 		: out  	std_logic_vector (1 downto 0);		-- Latched status flags of pointed FIFO (muxed)
+				n_vc_deq 			: out  	std_logic;									-- Dequeue latch input (from RNA) (dmuxed)
+				n_vc_rnaSelI 		: out  	std_logic_vector (1 downto 0);		-- FIFO select for input (from RNA) 
+				n_vc_rnaSelO 		: out  	std_logic_vector (1 downto 0);		-- FIFO select for output (from RNA) 
+				n_vc_rnaSelS		: out		std_logic_vector (1 downto 0);		-- FIFO select for status (from RNA)
+				n_vc_strq 			: out  	std_logic;									-- Status request (from RNA) (dmuxed)
+				n_vc_status 		: in  	std_logic_vector (1 downto 0);		-- Latched status flags of pointed FIFO (muxed)
 				
-				e_vc_deq 			: in  	std_logic;									-- Dequeue latch input (from RNA) (dmuxed)
-				e_vc_rnaSelI 		: in  	std_logic_vector (1 downto 0);		-- FIFO select for input (from RNA) 
-				e_vc_rnaSelO 		: in  	std_logic_vector (1 downto 0);		-- FIFO select for output (from RNA) 
-				e_vc_rnaSelS		: in		std_logic_vector (1 downto 0);		-- FIFO select for status (from RNA)
-				e_vc_strq 			: in  	std_logic;									-- Status request (from RNA) (dmuxed)
-				e_vc_status 		: out  	std_logic_vector (1 downto 0);		-- Latched status flags of pointed FIFO (muxed)
+				e_vc_deq 			: out  	std_logic;									-- Dequeue latch input (from RNA) (dmuxed)
+				e_vc_rnaSelI 		: out  	std_logic_vector (1 downto 0);		-- FIFO select for input (from RNA) 
+				e_vc_rnaSelO 		: out  	std_logic_vector (1 downto 0);		-- FIFO select for output (from RNA) 
+				e_vc_rnaSelS		: out		std_logic_vector (1 downto 0);		-- FIFO select for status (from RNA)
+				e_vc_strq 			: out  	std_logic;									-- Status request (from RNA) (dmuxed)
+				e_vc_status 		: in  	std_logic_vector (1 downto 0);		-- Latched status flags of pointed FIFO (muxed)
 				
-				s_vc_deq 			: in  	std_logic;									-- Dequeue latch input (from RNA) (dmuxed)
-				s_vc_rnaSelI 		: in  	std_logic_vector (1 downto 0);		-- FIFO select for input (from RNA) 
-				s_vc_rnaSelO 		: in  	std_logic_vector (1 downto 0);		-- FIFO select for output (from RNA) 
-				s_vc_rnaSelS		: in		std_logic_vector (1 downto 0);		-- FIFO select for status (from RNA)
-				s_vc_strq 			: in  	std_logic;									-- Status request (from RNA) (dmuxed)
-				s_vc_status 		: out  	std_logic_vector (1 downto 0);		-- Latched status flags of pointed FIFO (muxed)
+				s_vc_deq 			: out  	std_logic;									-- Dequeue latch input (from RNA) (dmuxed)
+				s_vc_rnaSelI 		: out  	std_logic_vector (1 downto 0);		-- FIFO select for input (from RNA) 
+				s_vc_rnaSelO 		: out  	std_logic_vector (1 downto 0);		-- FIFO select for output (from RNA) 
+				s_vc_rnaSelS		: out		std_logic_vector (1 downto 0);		-- FIFO select for status (from RNA)
+				s_vc_strq 			: out  	std_logic;									-- Status request (from RNA) (dmuxed)
+				s_vc_status 		: in  	std_logic_vector (1 downto 0);		-- Latched status flags of pointed FIFO (muxed)
 				
-				w_vc_deq 			: in  	std_logic;									-- Dequeue latch input (from RNA) (dmuxed)
-				w_vc_rnaSelI 		: in  	std_logic_vector (1 downto 0);		-- FIFO select for input (from RNA) 
-				w_vc_rnaSelO 		: in  	std_logic_vector (1 downto 0);		-- FIFO select for output (from RNA) 
-				w_vc_rnaSelS		: in		std_logic_vector (1 downto 0);		-- FIFO select for status (from RNA)
-				w_vc_strq 			: in  	std_logic;									-- Status request (from RNA) (dmuxed)
-				w_vc_status 		: out  	std_logic_vector (1 downto 0);		-- Latched status flags of pointed FIFO (muxed)
-			
+				w_vc_deq 			: out  	std_logic;									-- Dequeue latch input (from RNA) (dmuxed)
+				w_vc_rnaSelI 		: out  	std_logic_vector (1 downto 0);		-- FIFO select for input (from RNA) 
+				w_vc_rnaSelO 		: out  	std_logic_vector (1 downto 0);		-- FIFO select for output (from RNA) 
+				w_vc_rnaSelS		: out		std_logic_vector (1 downto 0);		-- FIFO select for status (from RNA)
+				w_vc_strq 			: out 	std_logic;									-- Status request (from RNA) (dmuxed)
+				w_vc_status 		: in  	std_logic_vector (1 downto 0);		-- Latched status flags of pointed FIFO (muxed)
+				
 				--Neighbor Arbiter 
 				n_NeighborCTRflg		: in std_logic;						--After CTR goes up, and once this goes 
 				e_NeighborCTRflg		: in std_logic;						--down, we dequeue our stuff.
@@ -270,7 +270,7 @@ BEGIN
 		wait for 1 ps;
 		reset <= '0';
 		
-		--PAYLOAD = 0x00000001 (ADDRESS) : GID = 0x01 : PID = 0x00 (PKT ID) : PATH = 0x00 : ADDR = 0x00 (CURRENT ADDRESS) : COND = 0x01
+		--PAYLOAD = 0x00000001 (ADDRESS) : GID = 0x01 : PID = 0x00 (PKT ID) : DIR = 0x00 : ADDR = 0x00 (CURRENT ADDRESS) : COND = 0x01
 		injt_ctrlPkt <= "00000000000000000000000000000001" & "00000001" & "00000001" & "000" & "00000000" & "01" & "0";
 		sw_rnaCtFl <= '1';
 		
@@ -279,23 +279,23 @@ BEGIN
 
 		-- insert stimulus here
 		
-		--PAYLOAD = 25 Cycles (TID) : GID = 0x01 (SOURCE)	: PID = 0x01 (PKT ID) :	PATH = 0x001 (EAST) : ADDR = 0x01 (ROUTER ADDRESS) : COND = 0x00
+		--PAYLOAD = 25 Cycles (TID) : GID = 0x01 (SOURCE)	: PID = 0x01 (PKT ID) :	DIR = 0x001 (EAST) : ADDR = 0x01 (ROUTER ADDRESS) : COND = 0x00
 		n_rnaCtrl <= "00000000000000000000000000011001" & "00000001" & "00000001" & "001" & "00000001" & "00" & "0"; 
 		n_CtrlFlg <= '1';
 		
-		--PAYLOAD = 30 Cycles (TID) : GID = 0x01 (SOURCE)	: PID = 0x02 (PKT ID) :	PATH = 0x001 (EAST) : ADDR = 0x02 (ROUTER ADDRESS) : COND = 0x00
+		--PAYLOAD = 30 Cycles (TID) : GID = 0x01 (SOURCE)	: PID = 0x02 (PKT ID) :	DIR = 0x001 (EAST) : ADDR = 0x02 (ROUTER ADDRESS) : COND = 0x00
 		e_rnaCtrl <= "00000000000000000000000000011110" & "00000001" & "00000010" & "001" & "00000010" & "00" & "0";
 		e_CtrlFlg <= '1';
 		
-		--PAYLOAD = 35 Cycles (TID) : GID = 0x01 (SOURCE)	: PID = 0x03 (PKT ID) :	PATH = 0x010 (SOUTH) : ADDR = 0x03 (ROUTER ADDRESS) : COND = 0x00
+		--PAYLOAD = 35 Cycles (TID) : GID = 0x01 (SOURCE)	: PID = 0x03 (PKT ID) :	DIR = 0x010 (SOUTH) : ADDR = 0x03 (ROUTER ADDRESS) : COND = 0x00
 		w_rnaCtrl <= "00000000000000000000000000100110" & "00000001" & "00000011" & "010" & "00000011" & "00" & "0";
 		w_CtrlFlg <= '1';
 		
-		--PAYLOAD = 40 Cycles (TID) : GID = 0x01 (SOURCE)	: PID = 0x04 (PKT ID) :	PATH = 0x010 (SOUTH) : ADDR = 0x06 (ROUTER ADDRESS) : COND = 0x00
+		--PAYLOAD = 40 Cycles (TID) : GID = 0x01 (SOURCE)	: PID = 0x04 (PKT ID) :	DIR = 0x010 (SOUTH) : ADDR = 0x06 (ROUTER ADDRESS) : COND = 0x00
 		s_rnaCtrl <= "00000000000000000000000000101000" & "00000001" & "00000100" & "010" & "00000110" & "00" & "0";
 		s_CtrlFlg <= '1';
 		
-		--PAYLOAD = 0 Cycles (TID) : GID = 0x01 (SOURCE)	: PID = 0x05 (PKT ID) :	PATH = 0x111 (DEST.) : ADDR = 0x09 (ROUTER ADDRESS) : COND = 0x00
+		--PAYLOAD = 0 Cycles (TID) : GID = 0x01 (SOURCE)	: PID = 0x05 (PKT ID) :	DIR = 0x111 (DEST.) : ADDR = 0x09 (ROUTER ADDRESS) : COND = 0x00
 		injt_ctrlPkt <= "00000000000000000000000000000000" & "00000001" & "00000101" & "111" & "00001001" & "00" & "0";
 		sw_rnaCtFl <= '1';
 		

@@ -48,30 +48,30 @@ entity ControlUnit is
 			rw						: out std_logic;
 			rsv_en				: out std_logic;
 			rte_en				: out std_logic;
-			n_vc_deq 			: in  std_logic;
-			n_vc_rnaSelI 		: in  std_logic_vector (1 downto 0);		 
-			n_vc_rnaSelO 		: in  std_logic_vector (1 downto 0);		
-			n_vc_rnaSelS		: in	std_logic_vector (1 downto 0);		
-			n_vc_strq 			: in  std_logic;									
-			n_vc_status 		: out std_logic_vector (1 downto 0);		
-			e_vc_deq 			: in  std_logic;									
-			e_vc_rnaSelI 		: in  std_logic_vector (1 downto 0);		
-			e_vc_rnaSelO 		: in  std_logic_vector (1 downto 0);		 
-			e_vc_rnaSelS		: in	std_logic_vector (1 downto 0);
-			e_vc_strq 			: in  std_logic;
-			e_vc_status 		: out std_logic_vector (1 downto 0);
-			s_vc_deq 			: in  std_logic;							
-			s_vc_rnaSelI 		: in  std_logic_vector (1 downto 0); 
-			s_vc_rnaSelO 		: in  std_logic_vector (1 downto 0); 
-			s_vc_rnaSelS		: in	std_logic_vector (1 downto 0);
-			s_vc_strq 			: in  std_logic;							
-			s_vc_status 		: out std_logic_vector (1 downto 0);
-			w_vc_deq 			: in  std_logic;
-			w_vc_rnaSelI 		: in  std_logic_vector (1 downto 0); 
-			w_vc_rnaSelO 		: in  std_logic_vector (1 downto 0); 
-			w_vc_rnaSelS		: in	std_logic_vector (1 downto 0);
-			w_vc_strq 			: in  std_logic;
-			w_vc_status 		: out std_logic_vector (1 downto 0);
+			n_vc_deq 			: out  std_logic;
+			n_vc_rnaSelI 		: out  std_logic_vector (1 downto 0);		 
+			n_vc_rnaSelO 		: out  std_logic_vector (1 downto 0);		
+			n_vc_rnaSelS		: out	std_logic_vector (1 downto 0);		
+			n_vc_strq 			: out  std_logic;									
+			n_vc_status 		: in std_logic_vector (1 downto 0);		
+			e_vc_deq 			: out  std_logic;									
+			e_vc_rnaSelI 		: out  std_logic_vector (1 downto 0);		
+			e_vc_rnaSelO 		: out  std_logic_vector (1 downto 0);		 
+			e_vc_rnaSelS		: out	std_logic_vector (1 downto 0);
+			e_vc_strq 			: out std_logic;
+			e_vc_status 		: in std_logic_vector (1 downto 0);
+			s_vc_deq 			: out  std_logic;							
+			s_vc_rnaSelI 		: out  std_logic_vector (1 downto 0); 
+			s_vc_rnaSelO 		: out  std_logic_vector (1 downto 0); 
+			s_vc_rnaSelS		: out	std_logic_vector (1 downto 0);
+			s_vc_strq 			: out  std_logic;							
+			s_vc_status 		: in std_logic_vector (1 downto 0);
+			w_vc_deq 			: out  std_logic;
+			w_vc_rnaSelI 		: out  std_logic_vector (1 downto 0); 
+			w_vc_rnaSelO 		: out  std_logic_vector (1 downto 0); 
+			w_vc_rnaSelS		: out	std_logic_vector (1 downto 0);
+			w_vc_strq 			: out  std_logic;
+			w_vc_status 		: in std_logic_vector (1 downto 0);
 			n_NeighborCTRflg	: in std_logic;
 			e_NeighborCTRflg	: in std_logic;
 			s_NeighborCTRflg	: in std_logic;
@@ -100,8 +100,8 @@ entity ControlUnit is
 end ControlUnit;
 
 architecture Behavioral of ControlUnit is
-	type state_type is (start, north, east, south, west, injection, timer_check, dp_arrival1, 
-							  dp_arrival2, dp_arrival3, dp_arrival4);
+	type state_type is (start, north, east, south, west, injection, timer_check, dp_arrivedOnNorth, 
+							  dp_arrivedOnEast, dp_arrivedOnSouth, dp_arrivedOnWest);
 	signal state, next_state : state_type;
 	
 	signal router_address 	: std_logic_vector(PID_WIDTH-1 downto 0) := "00000000";
@@ -118,6 +118,7 @@ architecture Behavioral of ControlUnit is
 	signal r_address			: std_logic_vector(address_size-1 downto 0) := "0000";
 	signal reserved_cnt		: std_logic_vector(address_size-1 downto 0) := "0000";
 	signal index				: std_logic_vector(address_size-1 downto 0) := "0000";
+	signal rsv_address		: std_logic_vector(address_size-1 downto 0) := "0000";
 	signal next_pkt			: std_logic_vector(15 downto 0) := "0000000000000000";
 	signal start_timer 		: std_logic := '0';
 	signal time_expired  	: std_logic := '0';
@@ -128,10 +129,11 @@ architecture Behavioral of ControlUnit is
 	signal arrival				: std_logic := '0';
 	signal departure			: std_logic := '0';
 	signal table_full 		: std_logic := '0';
-	signal rsv_strobe_w		: std_logic := '0';
-	signal rsv_strobe_r		: std_logic := '0';
-	signal update_r			: std_logic := '0';
-	signal update_w			: std_logic := '0';
+	signal rsv_strobe			: std_logic := '0';
+	signal rsv_rw				: std_logic := '0';
+	signal d						: std_logic := '0';
+	signal en					: std_logic := '0';
+	signal q						: std_logic := '0';
 	signal timer_control		: std_logic := '0';
 
 	
@@ -251,8 +253,10 @@ begin
 							schedule(conv_integer(w_address)) := n_rnaCtrl(29 downto 14) & (globaltime + n_rnaCtrl(cp_size-1 downto 30));
 							--Store locally
 							address_lut(conv_integer(w_address)) := n_rnaCtrl(29 downto 14);
-							--Send to memory
-							rsv_strobe_w <= '1', '0' after 1 ns;
+							--Send to reservation table
+							rsv_address <= w_address;
+							rsv_rw <= '1';
+							rsv_strobe <= '1', '0' after 1 ns;
 						else
 							dummySignal <= '1', '0' after 1 ns;		-- Table is full. Ignore.
 						end if;
@@ -276,8 +280,10 @@ begin
 							rsv_packet <= e_rnaCtrl(29 downto 11);
 							--Write bits to sch_packet
 							schedule(conv_integer(w_address)) := e_rnaCtrl(29 downto 14) & (globaltime + e_rnaCtrl(cp_size-1 downto 30));
-							--Send to memory
-							rsv_strobe_w <= '1', '0' after 1 ns;
+							--Send to reservation table
+							rsv_address <= w_address;
+							rsv_rw <= '1';
+							rsv_strobe <= '1', '0' after 1 ns;
 						else
 							dummySignal <= '1', '0' after 1 ns;		-- Table is full. Ignore.
 						end if;
@@ -301,8 +307,10 @@ begin
 							rsv_packet <= s_rnaCtrl(29 downto 11);
 							--Write bits to sch_packet
 							schedule(conv_integer(w_address)) := s_rnaCtrl(29 downto 14) & (globaltime + s_rnaCtrl(cp_size-1 downto 30));
-							--Send to memory
-							rsv_strobe_w <= '1', '0' after 1 ns;
+							--Send to reservation table
+							rsv_address <= w_address;
+							rsv_rw <= '1';
+							rsv_strobe <= '1', '0' after 1 ns;
 						else
 							dummySignal <= '1', '0' after 1 ns;		-- Table is full. Ignore.
 						end if;
@@ -326,8 +334,10 @@ begin
 							rsv_packet <= w_rnaCtrl(29 downto 11);
 							--Write bits to sch_packet
 							schedule(conv_integer(w_address)) := w_rnaCtrl(29 downto 14) & (globaltime + w_rnaCtrl(cp_size-1 downto 30));
-							--Send to memory
-							rsv_strobe_w <= '1', '0' after 1 ns;
+							--Send to reservation table
+							rsv_address <= w_address;
+							rsv_rw <= '1';
+							rsv_strobe <= '1', '0' after 1 ns;
 						else
 							dummySignal <= '1', '0' after 1 ns;		-- Table is full. Ignore.
 						end if;
@@ -352,8 +362,10 @@ begin
 								rsv_packet <= injt_ctrlPkt(29 downto 11);
 								--Write bits to sch_packet
 								schedule(conv_integer(w_address)) := injt_ctrlPkt(29 downto 14) & (globaltime + injt_ctrlPkt(cp_size-1 downto 30));
-								--Send to memory
-								rsv_strobe_w <= '1', '0' after 1 ns;
+								--Send to reservation table
+								rsv_address <= w_address;
+								rsv_rw <= '1';
+								rsv_strobe <= '1', '0' after 1 ns;
 							else
 								dummySignal <= '1', '0' after 1 ns;				-- Table is full. Ignore.
 							end if;
@@ -386,41 +398,53 @@ begin
 					timer_control <= '1', '0' after 1 ns;
 				end if;
 				
-				next_state <= dp_arrival1;
-			when dp_arrival1 =>
+				next_state <= dp_arrivedOnNorth;
+			when dp_arrivedOnNorth =>
 				--Any new data packets?
 				if(n_NeighborCTRflg = '1') then
 					--for i in 0 to 15 loop
 						--Look for GID/PID 
 						--if()
 					--end loop;
-					rsv_strobe_r <= '1', '0' after 1 ns;
-				else
-					rsv_strobe_r <= '0';
+					rsv_address <= "0000";			--should be the address found above
+					rsv_rw <= '0';
+					rsv_strobe <= '1', '0' after 1 ns;
 				end if;
-				next_state <= dp_arrival2;
-			when dp_arrival2 =>
+				next_state <= dp_arrivedOnEast;
+			when dp_arrivedOnEast =>
 				--Any new data packets?
 				if(e_NeighborCTRflg = '1') then
-					rsv_strobe_r <= '1', '0' after 1 ns;
-				else
-					rsv_strobe_r <= '0';
+					--for i in 0 to 15 loop
+						--Look for GID/PID 
+						--if()
+					--end loop;
+					rsv_address <= "0000";			--should be the address found above
+					rsv_rw <= '0';
+					rsv_strobe <= '1', '0' after 1 ns;
 				end if;
-				next_state <= dp_arrival3;
-			when dp_arrival3 =>
+				next_state <= dp_arrivedOnSouth;
+			when dp_arrivedOnSouth =>
 				--Any new data packets?
 				if(s_NeighborCTRflg = '1') then
-					rsv_strobe_r <= '1', '0' after 1 ns;
-				else
-					rsv_strobe_r <= '0';
+					--for i in 0 to 15 loop
+						--Look for GID/PID 
+						--if()
+					--end loop;
+					rsv_address <= "0000";			--should be the address found above
+					rsv_rw <= '0';
+					rsv_strobe <= '1', '0' after 1 ns;
 				end if;
-				next_state <= dp_arrival4;
-			when dp_arrival4 =>
+				next_state <= dp_arrivedOnWest;
+			when dp_arrivedOnWest =>
 				--Any new data packets?
 				if(w_NeighborCTRflg = '1') then
-					rsv_strobe_r <= '1', '0' after 1 ns;
-				else
-					rsv_strobe_r <= '0';
+					--for i in 0 to 15 loop
+						--Look for GID/PID 
+						--if()
+					--end loop;
+					rsv_address <= "0000";			--should be the address found above
+					rsv_rw <= '0';
+					rsv_strobe <= '1', '0' after 1 ns;
 				end if;
 				next_state <= start;
 			when others =>
@@ -428,28 +452,23 @@ begin
 		end case;
 	end process;
 	
-	cpAccessRsvTable_process: process(rsv_strobe_r, rsv_strobe_w)
+	cpAccessRsvTable_process: process(rsv_strobe)
 	begin
-		if rising_edge(rsv_strobe_w) then
-			--Write to Reservation Table
-			address <= w_address;
+		if rsv_strobe'event and rsv_strobe = '1' then
+			address <= rsv_address;		--rsv_address = w_address || index ("0000");
 			rsv_data_out <= rsv_packet;
-			rsv_en <= '1', '0' after 1 ns;
-			rw <= '1';
-			
-			--Update counters
-			update_w <= '1', '0' after 1 ns;
-	
-		elsif rising_edge(rsv_strobe_r) then
-			--Read from Reservation Table
-			address <= index;
-			rw <= '0';
-			rsv_en <= '1', '0' after 1 ns;
 			rsv_packet_info <= rsv_data_in;
-		
-			arrival <= '1', '0' after 1 ns;
+			rw <= rsv_rw;
+			rsv_en <= '1', '0' after 1 ns;
+			
+			if rsv_rw = '1' then
+				d <= '1', '0' after 1 ns;
+			else
+				arrival <= '1', '0' after 1 ns;
+			end if;
 			
 		end if;
+		
 	end process;
 	
 
@@ -457,7 +476,7 @@ begin
 	--											  or stops and begins the departure sequence of the packet.
 	cpSchedulerTimerControl_process: process(timer_control)
 	begin
-		if rising_edge(timer_control) then
+		if timer_control'event and timer_control = '1' then
 			if(r_address /= w_address and start_timer = '0') then
 				start_timer <= '1';
 			else
@@ -471,28 +490,39 @@ begin
 	end process;
 	
 	--cpUpdateCounters_process: This process is responsible for sending the next packet 
-	--								out through the switch.
-	cpUpdateCounters_process: process(update_r, update_w)
+	--								out through the switch.	
+	cpUpdateCounters_process: process(d, q)
 	begin
-		if rising_edge(update_r) then
-			r_address <= r_address + 1;
-			reserved_cnt <= reserved_cnt - 1;
-			if(reserved_cnt <= "1110") then
-				table_full <= '0';
-			else
-				table_full <= '1';
-			end if;
+		if q = '1' and d = '0' then
+				--Update Counts and Check if the table has reached full capacity
+				r_address <= r_address + 1;
+				reserved_cnt <= reserved_cnt - 1;
+		elsif d = '1' and q = '0' then
+				w_address <= w_address + 1;
+				reserved_cnt <= reserved_cnt + 1;		
+		end if;
 		
-		elsif rising_edge(update_w) then
-			--Update Counts and Check if the table has reached full capacity
-			w_address <= w_address + 1;
-			reserved_cnt <= reserved_cnt + 1;
-			if(reserved_cnt = "1110") then
-				table_full <= '1';
-			else
-				table_full <= '0';
-			end if;
+		--Check table space
+		if(reserved_cnt <= "1110") then
+			table_full <= '0';
+		else
+			table_full <= '1';
+		end if;
+	end process;
+	
+	--cpForwardPacket_process: This process is responsible for forwarding the control packet
+	--						 out through the rna_ctrlPkt and configuring the switch.
+	cpForwardPacket_process: process(forwardPacket)
+	begin
+		if forwardPacket'event and forwardPacket = '1' then
+			--Configure the switch
+			sw_nSel <= "111";				--North Neighbor (use Control from Arbiter)
 			
+			--Write to rna_ctrlPkt
+			rna_ctrlPkt <= cp_packet;
+			
+			--Check CTR going high to low
+			--wait until falling_edge(n_CTRflg);
 		end if;
 	end process;
 	
@@ -500,12 +530,21 @@ begin
 	--								out through the switch.
 	dpDeparture_process: process(departure)
 	begin
-		if rising_edge(departure) then
+		if departure'event and departure = '1' then
+			--Look up Routing Table
 			--Grab PID/GID from next_pkt signal
 			--Control VCC
+			n_vc_rnaSelO <= "00";			-- "00" North FIFO 
+			n_vc_deq <= '1', '0' after 1 ns;
+			
 			--Set Switch to move packet
-			--Update Counters
-			update_r <= '1', '0' after 1 ns;
+			sw_nSel <= "001";					--North Neighbor (use Control from Arbiter)
+			
+			--Check CTR going high to low
+			--wait until falling_edge(n_CTRflg);
+			
+			--Update Space in Reservation Table now that packet has departed
+			q <= '1', '0' after 1 ns;
 		end if;
 	end process;
 	
@@ -513,10 +552,13 @@ begin
 	--							determining which resource the data packet must go to.
 	dpArrival_process: process(arrival)
 	begin
-		if rising_edge(arrival) then
+		if arrival'event and arrival = '1' then
 			--Read RSV_TABLE
 			--Control VCC
+			n_vc_rnaSelI <= "00";			--Value from RSV TABLE (PATH)
+	
 			--Acknowledge? 
+			n_CTRflg <= '1', '0' after 1 ns;
 			
 		end if;
 	end process;

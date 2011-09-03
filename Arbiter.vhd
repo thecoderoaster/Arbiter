@@ -47,33 +47,33 @@ entity Arbiter is
 				reset					: in std_logic;
 				
 				--Virtual Channel Related
-				n_vc_deq 			: in  	std_logic;									-- Dequeue latch input (from RNA) (dmuxed)
-				n_vc_rnaSelI 		: in  	std_logic_vector (1 downto 0);		-- FIFO select for input (from RNA) 
-				n_vc_rnaSelO 		: in  	std_logic_vector (1 downto 0);		-- FIFO select for output (from RNA) 
-				n_vc_rnaSelS		: in		std_logic_vector (1 downto 0);		-- FIFO select for status (from RNA)
-				n_vc_strq 			: in  	std_logic;									-- Status request (from RNA) (dmuxed)
-				n_vc_status 		: out  	std_logic_vector (1 downto 0);		-- Latched status flags of pointed FIFO (muxed)
+				n_vc_deq 			: out  	std_logic;									-- Dequeue latch input (from RNA) (dmuxed)
+				n_vc_rnaSelI 		: out  	std_logic_vector (1 downto 0);		-- FIFO select for input (from RNA) 
+				n_vc_rnaSelO 		: out  	std_logic_vector (1 downto 0);		-- FIFO select for output (from RNA) 
+				n_vc_rnaSelS		: out		std_logic_vector (1 downto 0);		-- FIFO select for status (from RNA)
+				n_vc_strq 			: out  	std_logic;									-- Status request (from RNA) (dmuxed)
+				n_vc_status 		: in  	std_logic_vector (1 downto 0);		-- Latched status flags of pointed FIFO (muxed)
 				
-				e_vc_deq 			: in  	std_logic;									-- Dequeue latch input (from RNA) (dmuxed)
-				e_vc_rnaSelI 		: in  	std_logic_vector (1 downto 0);		-- FIFO select for input (from RNA) 
-				e_vc_rnaSelO 		: in  	std_logic_vector (1 downto 0);		-- FIFO select for output (from RNA) 
-				e_vc_rnaSelS		: in		std_logic_vector (1 downto 0);		-- FIFO select for status (from RNA)
-				e_vc_strq 			: in  	std_logic;									-- Status request (from RNA) (dmuxed)
-				e_vc_status 		: out  	std_logic_vector (1 downto 0);		-- Latched status flags of pointed FIFO (muxed)
+				e_vc_deq 			: out  	std_logic;									-- Dequeue latch input (from RNA) (dmuxed)
+				e_vc_rnaSelI 		: out  	std_logic_vector (1 downto 0);		-- FIFO select for input (from RNA) 
+				e_vc_rnaSelO 		: out  	std_logic_vector (1 downto 0);		-- FIFO select for output (from RNA) 
+				e_vc_rnaSelS		: out		std_logic_vector (1 downto 0);		-- FIFO select for status (from RNA)
+				e_vc_strq 			: out  	std_logic;									-- Status request (from RNA) (dmuxed)
+				e_vc_status 		: in  	std_logic_vector (1 downto 0);		-- Latched status flags of pointed FIFO (muxed)
 				
-				s_vc_deq 			: in  	std_logic;									-- Dequeue latch input (from RNA) (dmuxed)
-				s_vc_rnaSelI 		: in  	std_logic_vector (1 downto 0);		-- FIFO select for input (from RNA) 
-				s_vc_rnaSelO 		: in  	std_logic_vector (1 downto 0);		-- FIFO select for output (from RNA) 
-				s_vc_rnaSelS		: in		std_logic_vector (1 downto 0);		-- FIFO select for status (from RNA)
-				s_vc_strq 			: in  	std_logic;									-- Status request (from RNA) (dmuxed)
-				s_vc_status 		: out  	std_logic_vector (1 downto 0);		-- Latched status flags of pointed FIFO (muxed)
+				s_vc_deq 			: out  	std_logic;									-- Dequeue latch input (from RNA) (dmuxed)
+				s_vc_rnaSelI 		: out  	std_logic_vector (1 downto 0);		-- FIFO select for input (from RNA) 
+				s_vc_rnaSelO 		: out  	std_logic_vector (1 downto 0);		-- FIFO select for output (from RNA) 
+				s_vc_rnaSelS		: out		std_logic_vector (1 downto 0);		-- FIFO select for status (from RNA)
+				s_vc_strq 			: out  	std_logic;									-- Status request (from RNA) (dmuxed)
+				s_vc_status 		: in  	std_logic_vector (1 downto 0);		-- Latched status flags of pointed FIFO (muxed)
 				
-				w_vc_deq 			: in  	std_logic;									-- Dequeue latch input (from RNA) (dmuxed)
-				w_vc_rnaSelI 		: in  	std_logic_vector (1 downto 0);		-- FIFO select for input (from RNA) 
-				w_vc_rnaSelO 		: in  	std_logic_vector (1 downto 0);		-- FIFO select for output (from RNA) 
-				w_vc_rnaSelS		: in		std_logic_vector (1 downto 0);		-- FIFO select for status (from RNA)
-				w_vc_strq 			: in  	std_logic;									-- Status request (from RNA) (dmuxed)
-				w_vc_status 		: out  	std_logic_vector (1 downto 0);		-- Latched status flags of pointed FIFO (muxed)
+				w_vc_deq 			: out  	std_logic;									-- Dequeue latch input (from RNA) (dmuxed)
+				w_vc_rnaSelI 		: out  	std_logic_vector (1 downto 0);		-- FIFO select for input (from RNA) 
+				w_vc_rnaSelO 		: out  	std_logic_vector (1 downto 0);		-- FIFO select for output (from RNA) 
+				w_vc_rnaSelS		: out		std_logic_vector (1 downto 0);		-- FIFO select for status (from RNA)
+				w_vc_strq 			: out 	std_logic;									-- Status request (from RNA) (dmuxed)
+				w_vc_status 		: in  	std_logic_vector (1 downto 0);		-- Latched status flags of pointed FIFO (muxed)
 			
 				--Neighbor Arbiter 
 				n_NeighborCTRflg		: in std_logic;						--After CTR goes up, and once this goes 
@@ -155,30 +155,30 @@ architecture rtl of Arbiter is
 			rw						: out std_logic;
 			rsv_en				: out std_logic;
 			rte_en				: out std_logic;
-			n_vc_deq 			: in  std_logic;
-			n_vc_rnaSelI 		: in  std_logic_vector (1 downto 0);		 
-			n_vc_rnaSelO 		: in  std_logic_vector (1 downto 0);		
-			n_vc_rnaSelS		: in	std_logic_vector (1 downto 0);		
-			n_vc_strq 			: in  std_logic;									
-			n_vc_status 		: out std_logic_vector (1 downto 0);		
-			e_vc_deq 			: in  std_logic;									
-			e_vc_rnaSelI 		: in  std_logic_vector (1 downto 0);		
-			e_vc_rnaSelO 		: in  std_logic_vector (1 downto 0);		 
-			e_vc_rnaSelS		: in	std_logic_vector (1 downto 0);
-			e_vc_strq 			: in  std_logic;
-			e_vc_status 		: out std_logic_vector (1 downto 0);
-			s_vc_deq 			: in  std_logic;							
-			s_vc_rnaSelI 		: in  std_logic_vector (1 downto 0); 
-			s_vc_rnaSelO 		: in  std_logic_vector (1 downto 0); 
-			s_vc_rnaSelS		: in	std_logic_vector (1 downto 0);
-			s_vc_strq 			: in  std_logic;							
-			s_vc_status 		: out std_logic_vector (1 downto 0);
-			w_vc_deq 			: in  std_logic;
-			w_vc_rnaSelI 		: in  std_logic_vector (1 downto 0); 
-			w_vc_rnaSelO 		: in  std_logic_vector (1 downto 0); 
-			w_vc_rnaSelS		: in	std_logic_vector (1 downto 0);
-			w_vc_strq 			: in  std_logic;
-			w_vc_status 		: out std_logic_vector (1 downto 0);
+			n_vc_deq 			: out  std_logic;
+			n_vc_rnaSelI 		: out  std_logic_vector (1 downto 0);		 
+			n_vc_rnaSelO 		: out  std_logic_vector (1 downto 0);		
+			n_vc_rnaSelS		: out	std_logic_vector (1 downto 0);		
+			n_vc_strq 			: out  std_logic;									
+			n_vc_status 		: in std_logic_vector (1 downto 0);		
+			e_vc_deq 			: out  std_logic;									
+			e_vc_rnaSelI 		: out  std_logic_vector (1 downto 0);		
+			e_vc_rnaSelO 		: out  std_logic_vector (1 downto 0);		 
+			e_vc_rnaSelS		: out	std_logic_vector (1 downto 0);
+			e_vc_strq 			: out std_logic;
+			e_vc_status 		: in std_logic_vector (1 downto 0);
+			s_vc_deq 			: out  std_logic;							
+			s_vc_rnaSelI 		: out  std_logic_vector (1 downto 0); 
+			s_vc_rnaSelO 		: out  std_logic_vector (1 downto 0); 
+			s_vc_rnaSelS		: out	std_logic_vector (1 downto 0);
+			s_vc_strq 			: out  std_logic;							
+			s_vc_status 		: in std_logic_vector (1 downto 0);
+			w_vc_deq 			: out  std_logic;
+			w_vc_rnaSelI 		: out  std_logic_vector (1 downto 0); 
+			w_vc_rnaSelO 		: out  std_logic_vector (1 downto 0); 
+			w_vc_rnaSelS		: out	std_logic_vector (1 downto 0);
+			w_vc_strq 			: out  std_logic;
+			w_vc_status 		: in std_logic_vector (1 downto 0);
 			n_NeighborCTRflg	: in std_logic; 
 			e_NeighborCTRflg	: in std_logic;						
 			s_NeighborCTRflg	: in std_logic;
