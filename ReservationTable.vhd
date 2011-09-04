@@ -28,9 +28,7 @@ entity ReservationTable is
 	generic(word_size 	: natural;
 			  address_size	: natural);
    port (  d 			: in  std_logic_vector(word_size-1 downto 0);
-			  rst			: in std_logic;
 			  addr 		: in std_logic_vector(address_size-1 downto 0);
-           clk 		: in  std_logic;
            rw 			: in  std_logic;
 			  en			: in std_logic;
            q 			: out std_logic_vector(word_size-1 downto 0));
@@ -72,7 +70,6 @@ begin
 	--main process:		Stores and Loads memory values based on address
 	process
 	begin
-		--wait until rising_edge(clk);
 			wait until en'event and en = '1';
 			--Read
 			if rw = '0' and en = '1' then

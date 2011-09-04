@@ -108,6 +108,7 @@ architecture Behavioral of ControlUnit is
 	signal rsv_packet 		: std_logic_vector(rsv_size-1 downto 0) := "0000000000000000000";
 	signal rsv_packet_info 	: std_logic_vector(rsv_size-1 downto 0) := "0000000000000000000";
 	signal rte_packet			: std_logic_vector(rte_size-1 downto 0) := "0000000000000000000000000";
+	signal rte_packet_info	: std_logic_vector(rte_size-1 downto 0) := "0000000000000000000000000";
 	signal cp_packet			: std_logic_vector(cp_size-1 downto 0)	:= "00000000000000000000000000000000000000000000000000000000000000";
 	signal globaltime			: std_logic_vector(31 downto 0) := "00000000000000000000000000000000";
 	signal counter 			: std_logic_vector(31 downto 0) := "00000000000000000000000000000000";
@@ -119,21 +120,24 @@ architecture Behavioral of ControlUnit is
 	signal reserved_cnt		: std_logic_vector(address_size-1 downto 0) := "0000";
 	signal index				: std_logic_vector(address_size-1 downto 0) := "0000";
 	signal rsv_address		: std_logic_vector(address_size-1 downto 0) := "0000";
+	signal rte_address		: std_logic_vector(address_size-1 downto 0) := "0000";
 	signal next_pkt			: std_logic_vector(15 downto 0) := "0000000000000000";
+	signal departingFromGate	: std_logic_vector(rte_size-1 downto 0) := "0000000000000000000000000";
 	signal start_timer 		: std_logic := '0';
 	signal time_expired  	: std_logic := '0';
 	signal addressChange 	: std_logic := '0';
-	signal rtChange			: std_logic := '0';
 	signal forwardPacket		: std_logic := '0';
-	signal dummySignal		: std_logic := '0';
-	signal arrival				: std_logic := '0';
-	signal departure			: std_logic := '0';
+	signal departurePacket	: std_logic := '0';
 	signal table_full 		: std_logic := '0';
 	signal rsv_strobe			: std_logic := '0';
+	signal rte_strobe			: std_logic := '0';
+	signal arrival				: std_logic := '0';
+	signal departure			: std_logic := '0';
+	signal forwardPkt_strobe : std_logic := '0';
 	signal rsv_rw				: std_logic := '0';
-	signal d						: std_logic := '0';
-	signal en					: std_logic := '0';
-	signal q						: std_logic := '0';
+	signal rte_rw				: std_logic := '0';
+	signal updateWrite		: std_logic := '0';
+	signal updateRead			: std_logic := '0';
 	signal timer_control		: std_logic := '0';
 
 	
@@ -257,16 +261,16 @@ begin
 							rsv_address <= w_address;
 							rsv_rw <= '1';
 							rsv_strobe <= '1', '0' after 1 ns;
-						else
-							dummySignal <= '1', '0' after 1 ns;		-- Table is full. Ignore.
 						end if;
 					else
-						--Forward the Packet
+						--Forward the Packet by checking routing table first
 						cp_packet <= n_rnaCtrl;
-						forwardPacket <= '1', '0' after 1 ns;
+						rte_address <= cp_packet(7 downto 3);
+						rte_rw <= '0';
+						forwardPacket <= '1';
+						departurePacket <= '0';
+						rte_strobe <= '1', '0' after 1 ns;
 					end if;
-				else
-					dummySignal <= '1', '0' after 1 ns;
 				end if;
 				next_state <= east;
 			when east =>
@@ -284,16 +288,16 @@ begin
 							rsv_address <= w_address;
 							rsv_rw <= '1';
 							rsv_strobe <= '1', '0' after 1 ns;
-						else
-							dummySignal <= '1', '0' after 1 ns;		-- Table is full. Ignore.
 						end if;
 					else
 						--Forward the Packet
 						cp_packet <= e_rnaCtrl;
-						forwardPacket <= '1', '0' after 1 ns;
+						rte_address <= cp_packet(7 downto 3);
+						rte_rw <= '0';
+						forwardPacket <= '1';
+						departurePacket <= '0';
+						rte_strobe <= '1', '0' after 1 ns;
 					end if;
-				else
-					dummySignal <= '1', '0' after 1 ns;
 				end if;
 				next_state <= south;
 			when south =>
@@ -311,16 +315,16 @@ begin
 							rsv_address <= w_address;
 							rsv_rw <= '1';
 							rsv_strobe <= '1', '0' after 1 ns;
-						else
-							dummySignal <= '1', '0' after 1 ns;		-- Table is full. Ignore.
 						end if;
 					else
 						--Forward the Packet
 						cp_packet <= s_rnaCtrl;
-						forwardPacket <= '1', '0' after 1 ns;
+						rte_address <= cp_packet(7 downto 3);
+						rte_rw <= '0';
+						forwardPacket <= '1';
+						departurePacket <= '0';
+						rte_strobe <= '1', '0' after 1 ns;
 					end if;
-				else
-					dummySignal <= '1', '0' after 1 ns;
 				end if;
 				next_state <= west;
 			when west =>
@@ -338,16 +342,16 @@ begin
 							rsv_address <= w_address;
 							rsv_rw <= '1';
 							rsv_strobe <= '1', '0' after 1 ns;
-						else
-							dummySignal <= '1', '0' after 1 ns;		-- Table is full. Ignore.
 						end if;
 					else
 						--Forward the Packet
 						cp_packet <= w_rnaCtrl;
-						forwardPacket <= '1', '0' after 1 ns;
+						rte_address <= cp_packet(7 downto 3);
+						rte_rw <= '0';
+						forwardPacket <= '1';
+						departurePacket <= '0';
+						rte_strobe <= '1', '0' after 1 ns;
 					end if;
-				else
-					dummySignal <= '1', '0' after 1 ns;
 				end if;
 				next_state <= injection;
 			when injection =>
@@ -366,24 +370,26 @@ begin
 								rsv_address <= w_address;
 								rsv_rw <= '1';
 								rsv_strobe <= '1', '0' after 1 ns;
-							else
-								dummySignal <= '1', '0' after 1 ns;				-- Table is full. Ignore.
 							end if;
 						elsif(injt_ctrlPkt(2 downto 1) = "01") then
 							router_address <= injt_ctrlPkt(37 downto 30); 	-- Condition: PE is re/assigning addresses	
 						elsif(injt_ctrlPkt(2 downto 1) = "10") then
 							cp_packet <= injt_ctrlPkt;
-							rtChange <= '1', '0' after 1 ns;						-- Condition: PE is updating Routing Table
-						else
-							dummySignal <= '1', '0' after 1 ns;					-- <RESERVED> For future condition
+							rte_address <= cp_packet(7 downto 3);
+							rte_rw <= '1';
+							forwardPacket <= '0';
+							departurePacket <= '0';
+							rte_strobe <= '1', '0' after 1 ns;					-- Condition: PE is updating Routing Table
 						end if;
 					else
 						--Forward the Packet
 						cp_packet <= injt_ctrlPkt;
-						forwardPacket <= '1', '0' after 1 ns;
+						rte_address <= cp_packet(7 downto 3);
+						rte_rw <= '0';
+						forwardPacket <= '1';
+						departurePacket <= '0';
+						rte_strobe <= '1', '0' after 1 ns;
 					end if;
-				else
-					dummySignal <= '1', '0' after 1 ns;
 				end if;
 				next_state <= timer_check;
 			when timer_check =>
@@ -393,6 +399,12 @@ begin
 					sch_packet := schedule(conv_integer(r_address));
 					expires_in <= sch_packet(31 downto 0);
 					next_pkt <= sch_packet(47 downto 32);
+					--Grab routing information right now for departure later.
+					rte_address <= sch_packet(47 downto 43);
+					rte_rw <= '0';
+					forwardPacket <= '0';
+					departurePacket <= '1';
+					rte_strobe <= '1', '0' after 1 ns;
 					timer_control <= '1', '0' after 1 ns;
 				else
 					timer_control <= '1', '0' after 1 ns;
@@ -452,9 +464,9 @@ begin
 		end case;
 	end process;
 	
-	cpAccessRsvTable_process: process(rsv_strobe)
+	cpAccessRsvRteTable_process: process(rsv_strobe, rte_strobe)
 	begin
-		if rsv_strobe'event and rsv_strobe = '1' then
+		if rsv_strobe = '1' then
 			address <= rsv_address;		--rsv_address = w_address || index ("0000");
 			rsv_data_out <= rsv_packet;
 			rsv_packet_info <= rsv_data_in;
@@ -462,16 +474,28 @@ begin
 			rsv_en <= '1', '0' after 1 ns;
 			
 			if rsv_rw = '1' then
-				d <= '1', '0' after 1 ns;
+				updateWrite <= '1', '0' after 1 ns;
 			else
 				arrival <= '1', '0' after 1 ns;
 			end if;
-			
 		end if;
 		
+		if rte_strobe = '1' then
+			address <= rte_address; 
+			rte_data_out <= rte_packet;
+			rte_packet_info <= rte_data_in;
+			rw <= rte_rw;
+			rte_en <= '1', '0' after 1 ns;
+			
+			if forwardPacket = '1' then
+				forwardPkt_strobe <= '1', '0' after 1 ns;
+			elsif departurePacket = '1' then
+				departingFromGate <= rte_packet_info;
+			end if;
+		end if;
+			
 	end process;
 	
-
 	--cpSchedulerTimerControl_process: This is the process that determines if the scheduled time starts
 	--											  or stops and begins the departure sequence of the packet.
 	cpSchedulerTimerControl_process: process(timer_control)
@@ -491,13 +515,15 @@ begin
 	
 	--cpUpdateCounters_process: This process is responsible for sending the next packet 
 	--								out through the switch.	
-	cpUpdateCounters_process: process(d, q)
+	cpUpdateCounters_process: process(updateWrite, updateRead)
 	begin
-		if q = '1' and d = '0' then
+		if updateRead = '1' then
 				--Update Counts and Check if the table has reached full capacity
 				r_address <= r_address + 1;
 				reserved_cnt <= reserved_cnt - 1;
-		elsif d = '1' and q = '0' then
+		end if;
+		
+		if updateWrite = '1' then
 				w_address <= w_address + 1;
 				reserved_cnt <= reserved_cnt + 1;		
 		end if;
@@ -510,28 +536,20 @@ begin
 		end if;
 	end process;
 	
-	--cpForwardPacket_process: This process is responsible for forwarding the control packet
-	--						 out through the rna_ctrlPkt and configuring the switch.
-	cpForwardPacket_process: process(forwardPacket)
+	
+	packetHandler_process: process(forwardPkt_strobe, departure, arrival)
 	begin
-		if forwardPacket'event and forwardPacket = '1' then
+		if forwardPkt_strobe = '1' then
 			--Configure the switch
+			--rte_packet_info
 			sw_nSel <= "111";				--North Neighbor (use Control from Arbiter)
 			
 			--Write to rna_ctrlPkt
 			rna_ctrlPkt <= cp_packet;
-			
-			--Check CTR going high to low
-			--wait until falling_edge(n_CTRflg);
 		end if;
-	end process;
-	
-	--dpDeparture_process: This process is responsible for sending the next packet 
-	--								out through the switch.
-	dpDeparture_process: process(departure)
-	begin
-		if departure'event and departure = '1' then
-			--Look up Routing Table
+		
+		if departure = '1' then
+			--Look up Routing Table (departingFromGate)
 			--Grab PID/GID from next_pkt signal
 			--Control VCC
 			n_vc_rnaSelO <= "00";			-- "00" North FIFO 
@@ -544,23 +562,18 @@ begin
 			--wait until falling_edge(n_CTRflg);
 			
 			--Update Space in Reservation Table now that packet has departed
-			q <= '1', '0' after 1 ns;
+			updateRead <= '1', '0' after 1 ns;
 		end if;
-	end process;
-	
-	--dpArrival_process: This process is responsible for reading the RSV_TABLE and 
-	--							determining which resource the data packet must go to.
-	dpArrival_process: process(arrival)
-	begin
-		if arrival'event and arrival = '1' then
+		
+		if arrival = '1' then
 			--Read RSV_TABLE
 			--Control VCC
 			n_vc_rnaSelI <= "00";			--Value from RSV TABLE (PATH)
 	
 			--Acknowledge? 
-			n_CTRflg <= '1', '0' after 1 ns;
-			
+			--n_CTRflg <= '1', '0' after 1 ns;		(doesn't work)
 		end if;
 	end process;
+	
 end Behavioral;
 

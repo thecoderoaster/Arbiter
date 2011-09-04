@@ -117,9 +117,7 @@ architecture rtl of Arbiter is
 	generic(word_size 	: natural;
 			  address_size	: natural);
    port (  d 			: in  std_logic_vector(word_size-1 downto 0);
-			  rst			: in std_logic;
 			  addr   	: in  std_logic_vector(address_size-1 downto 0);
-           clk 		: in  std_logic;
            rw 			: in  std_logic;
 			  en			: in  std_logic;
            q 			: out std_logic_vector(word_size-1 downto 0)
@@ -130,9 +128,7 @@ architecture rtl of Arbiter is
 	generic(word_size		: natural;
 			  address_size : natural);
 	port (  d 			: in  std_logic_vector(word_size-1 downto 0);
-			  rst			: in std_logic;
 			  addr   	: in  std_logic_vector(address_size-1 downto 0);
-           clk 		: in  std_logic;
            rw 			: in  std_logic;
 			  en			: in std_logic;
            q 			: out std_logic_vector(word_size-1 downto 0)
@@ -222,11 +218,11 @@ begin
 	
 	RsvTable : ReservationTable
 		generic map (RSV_WIDTH, ADDR_WIDTH)
-		port map (rsv_data_in, reset, address, clk, rw, rsv_en, rsv_data_out);
+		port map (rsv_data_in, address, rw, rsv_en, rsv_data_out);
 	
 	RteTable: RoutingTable
 		generic map (RTE_WIDTH, ADDR_WIDTH)
-		port map(rte_data_in, reset, address, clk, rw, rte_en, rte_data_out);
+		port map(rte_data_in, address, rw, rte_en, rte_data_out);
 	
 	Control	: ControlUnit
 		generic map(CP_WIDTH, ADDR_WIDTH, RSV_WIDTH, RTE_WIDTH)
