@@ -270,9 +270,111 @@ BEGIN
 		wait for 1 ps;
 		reset <= '0';
 		
+		--Update Routing Table
+		
+		--PAYLOAD = 0x00000001 (ADDRESS) : GID = 0x01 : PID = 0x00 (PKT ID) : DIR = 0x00 : ADDR = 0x00 (CURRENT ADDRESS) : COND = 0x01
+		injt_ctrlPkt <= "00000000000000000000000000000011" & "00000000" & "00000001" & "000" & "00000000" & "10" & "0";
+		sw_rnaCtFl <= '1';
+		
+		wait for clk_period*20;
+		
+		--PAYLOAD = 0x00000001 (ADDRESS) : GID = 0x01 : PID = 0x00 (PKT ID) : DIR = 0x00 : ADDR = 0x00 (CURRENT ADDRESS) : COND = 0x01
+		injt_ctrlPkt <= "00000000000000000000000000001110" & "00000001" & "00000001" & "000" & "00000000" & "10" & "0";
+		sw_rnaCtFl <= '1';
+		
+		wait for clk_period*20;
+		
+		--PAYLOAD = 0x00000001 (ADDRESS) : GID = 0x01 : PID = 0x00 (PKT ID) : DIR = 0x00 : ADDR = 0x00 (CURRENT ADDRESS) : COND = 0x01
+		injt_ctrlPkt <= "00000000000000000000000000000011" & "00000010" & "00000001" & "000" & "00000000" & "10" & "0";
+		sw_rnaCtFl <= '1';
+		
+		wait for clk_period*20;
+		
+		--PAYLOAD = 0x00000001 (ADDRESS) : GID = 0x01 : PID = 0x00 (PKT ID) : DIR = 0x00 : ADDR = 0x00 (CURRENT ADDRESS) : COND = 0x01
+		injt_ctrlPkt <= "00000000000000000000000000000101" & "00000011" & "00000001" & "000" & "00000000" & "10" & "0";
+		sw_rnaCtFl <= '1';
+		
+		wait for clk_period*20;
+		
+		--PAYLOAD = 0x00000001 (ADDRESS) : GID = 0x01 : PID = 0x00 (PKT ID) : DIR = 0x00 : ADDR = 0x00 (CURRENT ADDRESS) : COND = 0x01
+		injt_ctrlPkt <= "00000000000000000000000000000111" & "00000100" & "00000001" & "000" & "00000000" & "10" & "0";
+		sw_rnaCtFl <= '1';
+		
+		wait for clk_period*20;
+		
+		--PAYLOAD = 0x00000001 (ADDRESS) : GID = 0x01 : PID = 0x00 (PKT ID) : DIR = 0x00 : ADDR = 0x00 (CURRENT ADDRESS) : COND = 0x01
+		injt_ctrlPkt <= "00000000000000000000000000000101" & "00000101" & "00000001" & "000" & "00000000" & "10" & "0";
+		sw_rnaCtFl <= '1';
+		
+		wait for clk_period*20;
+		
+		--PAYLOAD = 0x00000001 (ADDRESS) : GID = 0x01 : PID = 0x00 (PKT ID) : DIR = 0x00 : ADDR = 0x00 (CURRENT ADDRESS) : COND = 0x01
+		injt_ctrlPkt <= "00000000000000000000000000000111" & "00000110" & "00000001" & "000" & "00000000" & "10" & "0";
+		sw_rnaCtFl <= '1';
+		
+		wait for clk_period*20;
+		
+		--PAYLOAD = 0x00000001 (ADDRESS) : GID = 0x01 : PID = 0x00 (PKT ID) : DIR = 0x00 : ADDR = 0x00 (CURRENT ADDRESS) : COND = 0x01
+		injt_ctrlPkt <= "00000000000000000000000000000001" & "00000111" & "00000001" & "000" & "00000000" & "10" & "0";
+		sw_rnaCtFl <= '1';
+		
+		wait for clk_period*20;
+		
+		--PAYLOAD = 0x00000001 (ADDRESS) : GID = 0x01 : PID = 0x00 (PKT ID) : DIR = 0x00 : ADDR = 0x00 (CURRENT ADDRESS) : COND = 0x01
+		injt_ctrlPkt <= "00000000000000000000000000000011" & "00001000" & "00000001" & "000" & "00000000" & "10" & "0";
+		sw_rnaCtFl <= '1';
+		
+		wait for clk_period*20;
+
+		--PAYLOAD = 0x00000001 (ADDRESS) : GID = 0x01 : PID = 0x00 (PKT ID) : DIR = 0x00 : ADDR = 0x00 (CURRENT ADDRESS) : COND = 0x01
+		injt_ctrlPkt <= "00000000000000000000000000000101" & "00001001" & "00000001" & "000" & "00000000" & "10" & "0";
+		sw_rnaCtFl <= '1';
+		
+		wait for clk_period*20;
+		
+		--PAYLOAD = 0x00000001 (ADDRESS) : GID = 0x01 : PID = 0x00 (PKT ID) : DIR = 0x00 : ADDR = 0x00 (CURRENT ADDRESS) : COND = 0x01
+		injt_ctrlPkt <= "00000000000000000000000000000001" & "00001010" & "00000001" & "000" & "00000000" & "10" & "0";
+		sw_rnaCtFl <= '1';
+		
+		wait for clk_period*20;
+		
+		--PAYLOAD = 0x00000001 (ADDRESS) : GID = 0x01 : PID = 0x00 (PKT ID) : DIR = 0x00 : ADDR = 0x00 (CURRENT ADDRESS) : COND = 0x01
+		injt_ctrlPkt <= "00000000000000000000000000000011" & "00001011" & "00000001" & "000" & "00000000" & "10" & "0";
+		sw_rnaCtFl <= '1';
+		
+		wait for clk_period*20;
+		
+		--PAYLOAD = 0x00000001 (ADDRESS) : GID = 0x01 : PID = 0x00 (PKT ID) : DIR = 0x00 : ADDR = 0x00 (CURRENT ADDRESS) : COND = 0x01
+		injt_ctrlPkt <= "00000000000000000000000000000101" & "00001100" & "00000001" & "000" & "00000000" & "10" & "0";
+		sw_rnaCtFl <= '1';
+		
+		wait for clk_period*20;
+		
+		--PAYLOAD = 0x00000001 (ADDRESS) : GID = 0x01 : PID = 0x00 (PKT ID) : DIR = 0x00 : ADDR = 0x00 (CURRENT ADDRESS) : COND = 0x01
+		injt_ctrlPkt <= "00000000000000000000000000000111" & "00001101" & "00000001" & "000" & "00000000" & "10" & "0";
+		sw_rnaCtFl <= '1';
+		
+		wait for clk_period*20;
+		
+		--PAYLOAD = 0x00000001 (ADDRESS) : GID = 0x01 : PID = 0x00 (PKT ID) : DIR = 0x00 : ADDR = 0x00 (CURRENT ADDRESS) : COND = 0x01
+		injt_ctrlPkt <= "00000000000000000000000000000101" & "00001110" & "00000001" & "000" & "00000000" & "10" & "0";
+		sw_rnaCtFl <= '1';
+		
+		wait for clk_period*20;
+		
+		--PAYLOAD = 0x00000001 (ADDRESS) : GID = 0x01 : PID = 0x00 (PKT ID) : DIR = 0x00 : ADDR = 0x00 (CURRENT ADDRESS) : COND = 0x01
+		injt_ctrlPkt <= "00000000000000000000000000000001" & "00001111" & "00000001" & "000" & "00000000" & "10" & "0";
+		sw_rnaCtFl <= '1';
+		
+		wait for clk_period*20;
+	
+		--Update Router Address
+		
 		--PAYLOAD = 0x00000001 (ADDRESS) : GID = 0x01 : PID = 0x00 (PKT ID) : DIR = 0x00 : ADDR = 0x00 (CURRENT ADDRESS) : COND = 0x01
 		injt_ctrlPkt <= "00000000000000000000000000000001" & "00000001" & "00000001" & "000" & "00000000" & "01" & "0";
 		sw_rnaCtFl <= '1';
+
+
 		
 		--Wait 10 us before starting
 		wait for clk_period*10;			

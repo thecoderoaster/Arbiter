@@ -107,8 +107,8 @@ architecture Behavioral of ControlUnit is
 	signal router_address 	: std_logic_vector(PID_WIDTH-1 downto 0) := "00000000";
 	signal rsv_packet 		: std_logic_vector(rsv_size-1 downto 0) := "0000000000000000000";
 	signal rsv_packet_info 	: std_logic_vector(rsv_size-1 downto 0) := "0000000000000000000";
-	signal rte_packet			: std_logic_vector(rte_size-1 downto 0) := "0000000000000000000000000";
-	signal rte_packet_info	: std_logic_vector(rte_size-1 downto 0) := "0000000000000000000000000";
+	signal rte_packet			: std_logic_vector(rte_size-1 downto 0) := "0000";
+	signal rte_packet_info	: std_logic_vector(rte_size-1 downto 0) := "0000";
 	signal cp_packet			: std_logic_vector(cp_size-1 downto 0)	:= "00000000000000000000000000000000000000000000000000000000000000";
 	signal globaltime			: std_logic_vector(31 downto 0) := "00000000000000000000000000000000";
 	signal counter 			: std_logic_vector(31 downto 0) := "00000000000000000000000000000000";
@@ -122,7 +122,7 @@ architecture Behavioral of ControlUnit is
 	signal rsv_address		: std_logic_vector(address_size-1 downto 0) := "0000";
 	signal rte_address		: std_logic_vector(address_size-1 downto 0) := "0000";
 	signal next_pkt			: std_logic_vector(15 downto 0) := "0000000000000000";
-	signal departingFromGate	: std_logic_vector(rte_size-1 downto 0) := "0000000000000000000000000";
+	signal departingFromGate	: std_logic_vector(rte_size-1 downto 0) := "0000";
 	signal start_timer 		: std_logic := '0';
 	signal time_expired  	: std_logic := '0';
 	signal addressChange 	: std_logic := '0';
@@ -265,7 +265,7 @@ begin
 					else
 						--Forward the Packet by checking routing table first
 						cp_packet <= n_rnaCtrl;
-						rte_address <= cp_packet(7 downto 3);
+						rte_address <= cp_packet(6 downto 3);
 						rte_rw <= '0';
 						forwardPacket <= '1';
 						departurePacket <= '0';
@@ -292,7 +292,7 @@ begin
 					else
 						--Forward the Packet
 						cp_packet <= e_rnaCtrl;
-						rte_address <= cp_packet(7 downto 3);
+						rte_address <= cp_packet(6 downto 3);
 						rte_rw <= '0';
 						forwardPacket <= '1';
 						departurePacket <= '0';
@@ -319,7 +319,7 @@ begin
 					else
 						--Forward the Packet
 						cp_packet <= s_rnaCtrl;
-						rte_address <= cp_packet(7 downto 3);
+						rte_address <= cp_packet(6 downto 3);
 						rte_rw <= '0';
 						forwardPacket <= '1';
 						departurePacket <= '0';
@@ -346,7 +346,7 @@ begin
 					else
 						--Forward the Packet
 						cp_packet <= w_rnaCtrl;
-						rte_address <= cp_packet(7 downto 3);
+						rte_address <= cp_packet(6 downto 3);
 						rte_rw <= '0';
 						forwardPacket <= '1';
 						departurePacket <= '0';
@@ -375,7 +375,8 @@ begin
 							router_address <= injt_ctrlPkt(37 downto 30); 	-- Condition: PE is re/assigning addresses	
 						elsif(injt_ctrlPkt(2 downto 1) = "10") then
 							cp_packet <= injt_ctrlPkt;
-							rte_address <= cp_packet(7 downto 3);
+							rte_address <= cp_packet(25 downto 22);
+							rte_packet <= cp_packet(33 downto 30);
 							rte_rw <= '1';
 							forwardPacket <= '0';
 							departurePacket <= '0';
@@ -384,7 +385,7 @@ begin
 					else
 						--Forward the Packet
 						cp_packet <= injt_ctrlPkt;
-						rte_address <= cp_packet(7 downto 3);
+						rte_address <= cp_packet(6 downto 3);
 						rte_rw <= '0';
 						forwardPacket <= '1';
 						departurePacket <= '0';
@@ -400,7 +401,7 @@ begin
 					expires_in <= sch_packet(31 downto 0);
 					next_pkt <= sch_packet(47 downto 32);
 					--Grab routing information right now for departure later.
-					rte_address <= sch_packet(47 downto 43);
+					rte_address <= sch_packet(46 downto 43);
 					rte_rw <= '0';
 					forwardPacket <= '0';
 					departurePacket <= '1';
