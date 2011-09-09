@@ -122,6 +122,7 @@ architecture Behavioral of ControlUnit is
 	signal rsv_address		: std_logic_vector(address_size-1 downto 0) := "0000";
 	signal rte_address		: std_logic_vector(address_size-1 downto 0) := "0000";
 	signal next_pkt			: std_logic_vector(15 downto 0) := "0000000000000000";
+	signal next_pkt_dst		: std_logic_vector(7 downto 0) := "00000000";
 	signal departingFromGate	: std_logic_vector(rte_size-1 downto 0) := "0000";
 	signal start_timer 		: std_logic := '0';
 	signal time_expired  	: std_logic := '0';
@@ -201,22 +202,22 @@ begin
 	type schedule_type is array(0 to 2**address_size-1) of
 		std_logic_vector(SCH_WIDTH-1 downto 0);
 	variable schedule: schedule_type := 
-	( "000000000000000000000000000000000000000000000000",
-	  "000000000000000000000000000000000000000000000000",
-	  "000000000000000000000000000000000000000000000000",
-	  "000000000000000000000000000000000000000000000000",
-	  "000000000000000000000000000000000000000000000000",
-	  "000000000000000000000000000000000000000000000000",
-	  "000000000000000000000000000000000000000000000000",
-	  "000000000000000000000000000000000000000000000000",
-	  "000000000000000000000000000000000000000000000000",
-	  "000000000000000000000000000000000000000000000000",
-	  "000000000000000000000000000000000000000000000000",
-	  "000000000000000000000000000000000000000000000000",
-	  "000000000000000000000000000000000000000000000000",
-	  "000000000000000000000000000000000000000000000000",
-	  "000000000000000000000000000000000000000000000000",
-	  "000000000000000000000000000000000000000000000000");
+	( "00000000000000000000000000000000000000000000000000000000",
+	  "00000000000000000000000000000000000000000000000000000000",
+	  "00000000000000000000000000000000000000000000000000000000",
+	  "00000000000000000000000000000000000000000000000000000000",
+	  "00000000000000000000000000000000000000000000000000000000",
+	  "00000000000000000000000000000000000000000000000000000000",
+	  "00000000000000000000000000000000000000000000000000000000",
+	  "00000000000000000000000000000000000000000000000000000000",
+	  "00000000000000000000000000000000000000000000000000000000",
+	  "00000000000000000000000000000000000000000000000000000000",
+	  "00000000000000000000000000000000000000000000000000000000",
+	  "00000000000000000000000000000000000000000000000000000000",
+	  "00000000000000000000000000000000000000000000000000000000",
+	  "00000000000000000000000000000000000000000000000000000000",
+	  "00000000000000000000000000000000000000000000000000000000",
+	  "00000000000000000000000000000000000000000000000000000000");
 	  
 	type addresslut_type is array(0 to 2**address_size-1) of
 		std_logic_vector(15 downto 0);
@@ -238,7 +239,7 @@ begin
 	  "0000000000000000",
 	  "0000000000000000");
 	  
-	variable sch_packet	: std_logic_vector(SCH_WIDTH-1 downto 0) :=  "000000000000000000000000000000000000000000000000";
+	variable sch_packet	: std_logic_vector(SCH_WIDTH-1 downto 0) :=  "00000000000000000000000000000000000000000000000000000000";
 
 	begin
 		case state is
@@ -254,7 +255,7 @@ begin
 							--Write bits to rsv_packet
 							rsv_packet <= n_rnaCtrl(29 downto 11);
 							--Write bits to sch_packet
-							schedule(conv_integer(w_address)) := n_rnaCtrl(29 downto 14) & (globaltime + n_rnaCtrl(cp_size-1 downto 30));
+							schedule(conv_integer(w_address)) := n_rnaCtrl(29 downto 14) & n_rnaCtrl(10 downto 3) & (globaltime + n_rnaCtrl(cp_size-1 downto 30));
 							--Store locally
 							address_lut(conv_integer(w_address)) := n_rnaCtrl(29 downto 14);
 							--Send to reservation table
@@ -283,7 +284,7 @@ begin
 							--Write bits to rsv_packet
 							rsv_packet <= e_rnaCtrl(29 downto 11);
 							--Write bits to sch_packet
-							schedule(conv_integer(w_address)) := e_rnaCtrl(29 downto 14) & (globaltime + e_rnaCtrl(cp_size-1 downto 30));
+							schedule(conv_integer(w_address)) := e_rnaCtrl(29 downto 14) & e_rnaCtrl(10 downto 3) & (globaltime + e_rnaCtrl(cp_size-1 downto 30));
 							--Send to reservation table
 							rsv_address <= w_address;
 							rsv_rw <= '1';
@@ -310,7 +311,7 @@ begin
 							--Write bits to rsv_packet
 							rsv_packet <= s_rnaCtrl(29 downto 11);
 							--Write bits to sch_packet
-							schedule(conv_integer(w_address)) := s_rnaCtrl(29 downto 14) & (globaltime + s_rnaCtrl(cp_size-1 downto 30));
+							schedule(conv_integer(w_address)) := s_rnaCtrl(29 downto 14) & s_rnaCtrl(10 downto 3) & (globaltime + s_rnaCtrl(cp_size-1 downto 30));
 							--Send to reservation table
 							rsv_address <= w_address;
 							rsv_rw <= '1';
@@ -337,7 +338,7 @@ begin
 							--Write bits to rsv_packet
 							rsv_packet <= w_rnaCtrl(29 downto 11);
 							--Write bits to sch_packet
-							schedule(conv_integer(w_address)) := w_rnaCtrl(29 downto 14) & (globaltime + w_rnaCtrl(cp_size-1 downto 30));
+							schedule(conv_integer(w_address)) := w_rnaCtrl(29 downto 14) & w_rnaCtrl(10 downto 3) & (globaltime + w_rnaCtrl(cp_size-1 downto 30));
 							--Send to reservation table
 							rsv_address <= w_address;
 							rsv_rw <= '1';
@@ -365,7 +366,7 @@ begin
 								--Write bits to rsv_packet
 								rsv_packet <= injt_ctrlPkt(29 downto 11);
 								--Write bits to sch_packet
-								schedule(conv_integer(w_address)) := injt_ctrlPkt(29 downto 14) & (globaltime + injt_ctrlPkt(cp_size-1 downto 30));
+								schedule(conv_integer(w_address)) := injt_ctrlPkt(29 downto 14) & injt_ctrlPkt(10 downto 3) & (globaltime + injt_ctrlPkt(cp_size-1 downto 30));
 								--Send to reservation table
 								rsv_address <= w_address;
 								rsv_rw <= '1';
@@ -398,10 +399,12 @@ begin
 				if(r_address /= w_address and start_timer = '0') then
 					--Grab time from scheduler
 					sch_packet := schedule(conv_integer(r_address));
+					next_pkt <= sch_packet(55 downto 40);
+					next_pkt_dst <= sch_packet(39 downto 32);
 					expires_in <= sch_packet(31 downto 0);
-					next_pkt <= sch_packet(47 downto 32);
-					--Grab routing information right now for departure later.
-					rte_address <= sch_packet(46 downto 43);
+					
+					--Grab routing information.
+					rte_address <= next_pkt_dst(3 downto 0);	-- Only doing a max of 16 nodes in network for now
 					rte_rw <= '0';
 					forwardPacket <= '0';
 					departurePacket <= '1';

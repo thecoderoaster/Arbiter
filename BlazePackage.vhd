@@ -14,7 +14,7 @@ package router_library is
 	constant WIDTH			: integer := 31;
 	constant CP_WIDTH		: integer := 62;
 	constant	RSV_WIDTH 	: integer := 19;
-	constant SCH_WIDTH	: integer := 48;
+	constant SCH_WIDTH	: integer := 56;
 	constant RTE_WIDTH	: integer := 4;
 	constant PID_WIDTH	: integer := 8;
 	constant GID_WIDTH	: integer := 8;
