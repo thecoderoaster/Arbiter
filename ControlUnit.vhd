@@ -100,48 +100,35 @@ entity ControlUnit is
 end ControlUnit;
 
 architecture Behavioral of ControlUnit is
-	type state_type is (start, north, east, south, west, injection, timer_check, dp_arrivedOnNorth, 
-							  dp_arrivedOnEast, dp_arrivedOnSouth, dp_arrivedOnWest);
+	type state_type is (start, north1, north2, north3, north4, north5, north6, north7,
+							  east1, east2, east3, east4, east5, east6, east7,
+							  south1, south2, south3, south4, south5, south6, south7,
+							  west1, west2, west3, west4, west5, west6, west7,
+							  injection1, injection2, injection3, injection4, injection5,
+							  injection6, injection7, injection8, injection9, injection10,
+							  timer_check1, timer_check2, timer_check3, timer_check4,
+							  departure1,
+							  dp_arrivedOnNorth1, dp_arrivedOnNorth2, dp_arrivedOnNorth3,
+							  dp_arrivedOnEast1, dp_arrivedOnEast2, dp_arrivedOnEast3,
+							  dp_arrivedOnSouth1, dp_arrivedOnSouth2, dp_arrivedOnSouth3,
+							  dp_arrivedOnWest1, dp_arrivedOnWest2, dp_arrivedOnWest3);   --56 State FSM
 	signal state, next_state : state_type;
 	
 	signal router_address 	: std_logic_vector(PID_WIDTH-1 downto 0) := "00000000";
-	signal rsv_packet 		: std_logic_vector(rsv_size-1 downto 0) := "0000000000000000000";
-	signal rsv_packet_info 	: std_logic_vector(rsv_size-1 downto 0) := "0000000000000000000";
-	signal rte_packet			: std_logic_vector(rte_size-1 downto 0) := "0000";
-	signal rte_packet_info	: std_logic_vector(rte_size-1 downto 0) := "0000";
-	signal cp_packet			: std_logic_vector(cp_size-1 downto 0)	:= "00000000000000000000000000000000000000000000000000000000000000";
+
+	--Timer Related Signals
 	signal globaltime			: std_logic_vector(31 downto 0) := "00000000000000000000000000000000";
 	signal counter 			: std_logic_vector(31 downto 0) := "00000000000000000000000000000000";
-	signal expires_in			: std_logic_vector(31 downto 0) := "00000000000000000000000000000000";
 	signal timeunit1 			: std_logic_vector(15 downto 0) := "0000000000000000";
 	signal timeunit2 			: std_logic_vector(15 downto 0) := "0000000000000000";
-	signal w_address 			: std_logic_vector(address_size-1 downto 0) := "0000";
-	signal r_address			: std_logic_vector(address_size-1 downto 0) := "0000";
-	signal reserved_cnt		: std_logic_vector(address_size-1 downto 0) := "0000";
-	signal index				: std_logic_vector(address_size-1 downto 0) := "0000";
-	signal rsv_address		: std_logic_vector(address_size-1 downto 0) := "0000";
-	signal rte_address		: std_logic_vector(address_size-1 downto 0) := "0000";
-	signal next_pkt			: std_logic_vector(15 downto 0) := "0000000000000000";
-	signal next_pkt_dst		: std_logic_vector(7 downto 0) := "00000000";
-	signal departingFromGate	: std_logic_vector(rte_size-1 downto 0) := "0000";
 	signal start_timer 		: std_logic := '0';
 	signal time_expired  	: std_logic := '0';
-	signal addressChange 	: std_logic := '0';
-	signal forwardPacket		: std_logic := '0';
-	signal departurePacket	: std_logic := '0';
-	signal table_full 		: std_logic := '0';
-	signal rsv_strobe			: std_logic := '0';
-	signal rte_strobe			: std_logic := '0';
-	signal arrival				: std_logic := '0';
-	signal departure			: std_logic := '0';
-	signal forwardPkt_strobe : std_logic := '0';
-	signal rsv_rw				: std_logic := '0';
-	signal rte_rw				: std_logic := '0';
-	signal updateWrite		: std_logic := '0';
-	signal updateRead			: std_logic := '0';
-	signal timer_control		: std_logic := '0';
+		
+	--Departure Itinerary
+	signal next_pkt_to_depart				: std_logic_vector(15 downto 0) := "0000000000000000";
+	signal next_pkt_departing_from_gate	: std_logic_vector(rte_size-1 downto 0) := "0000";
+	signal next_pkt_expires_in				: std_logic_vector(31 downto 0) := "00000000000000000000000000000000";
 
-	
 begin
 
 	--globaltimer_process: This is the running timer (indefinitely)
@@ -178,7 +165,7 @@ begin
 				time_expired <= '0';
 				if(timeunit2 = "0000000000000110") then								-- was 1000 cycles 0000000000111110
 					counter <= counter + "00000000000000000000000000000001";		--increment the counter by 1 tick
-					if(counter = expires_in) then
+					if(counter = next_pkt_expires_in) then
 						counter <= "00000000000000000000000000000000";
 						time_expired <= '1';
 					end if;
@@ -240,344 +227,485 @@ begin
 	  "0000000000000000");
 	  
 	variable sch_packet	: std_logic_vector(SCH_WIDTH-1 downto 0) :=  "00000000000000000000000000000000000000000000000000000000";
+	--Memory Related Variables (Routing/Reservation/Scheduler)
+	variable w_address 			: std_logic_vector(address_size-1 downto 0) := "0000";
+	variable r_address			: std_logic_vector(address_size-1 downto 0) := "0000";
+	variable reserved_cnt		: std_logic_vector(address_size-1 downto 0) := "0000";
+	variable table_full 			: std_logic := '0';
 
 	begin
 		case state is
 			when start =>
-				next_state <= north;
-			when north =>
+				next_state <= north1;
+--*NORTH*--
+			when north1 =>
 				--Check flag
 				if(n_CtrlFlg = '1') then
-					if(n_rnaCtrl(10 downto 3) = router_address) then
-						if(table_full = '0') then
-							--Ack!
-							n_CTRflg <= '1', '0' after 1 ns;
-							--Write bits to rsv_packet
-							rsv_packet <= n_rnaCtrl(29 downto 11);
-							--Write bits to sch_packet
-							schedule(conv_integer(w_address)) := n_rnaCtrl(29 downto 14) & n_rnaCtrl(10 downto 3) & (globaltime + n_rnaCtrl(cp_size-1 downto 30));
-							--Store locally
-							address_lut(conv_integer(w_address)) := n_rnaCtrl(29 downto 14);
-							--Send to reservation table
-							rsv_address <= w_address;
-							rsv_rw <= '1';
-							rsv_strobe <= '1', '0' after 1 ns;
-						end if;
-					else
-						--Forward the Packet by checking routing table first
-						cp_packet <= n_rnaCtrl;
-						rte_address <= cp_packet(6 downto 3);
-						rte_rw <= '0';
-						forwardPacket <= '1';
-						departurePacket <= '0';
-						rte_strobe <= '1', '0' after 1 ns;
-					end if;
+					next_state <= north2;
+				else
+					next_state <= east1;
 				end if;
-				next_state <= east;
-			when east =>
+			when north2 =>
+				if(n_rnaCtrl(10 downto 3) = router_address) then
+					next_state <= north3;	--It's for me!
+				else
+					next_state <= north4;	--Forward the control packet.
+				end if;
+			when north3 =>
+				if(table_full = '0') then
+					next_state <= north5;
+				else
+					next_state <= east1;
+				end if;
+			when north4 =>
+				--Forward the Packet by checking routing table first
+				address <= n_rnaCtrl(6 downto 3);
+				rw <= '0';
+				rte_en <= '1', '0' after 1 ns;	
+				next_state <= north6;
+			when north5 =>	
+				--Reserve and schedule the incoming control packet
+				--Ack!
+				n_CTRflg <= '1', '0' after 1 ns;
+				--Write bits to rsv_data_out
+				rsv_data_out <= n_rnaCtrl(29 downto 11);
+				--Write bits to sch_packet
+				schedule(conv_integer(w_address)) := n_rnaCtrl(29 downto 14) & n_rnaCtrl(10 downto 3) & (globaltime + n_rnaCtrl(cp_size-1 downto 30));
+				--Store locally
+				address_lut(conv_integer(w_address)) := n_rnaCtrl(29 downto 14);
+				--Send to reservation table
+				address <= w_address;
+				rw <= '1';
+				rsv_en <= '1', '0' after 1 ns;
+				next_state <= north7;
+			when north6 =>
+				--Configure the switch
+				sw_nSel <= rte_data_in(3 downto 1);				--North Neighbor (use Control from Arbiter)
+				--Write to rna_ctrlPkt
+				rna_ctrlPkt <= n_rnaCtrl;
+				next_state <= east1;
+			when north7 =>
+				w_address := w_address + 1;
+				reserved_cnt := reserved_cnt + 1;
+				
+				--Check table space
+				if(reserved_cnt <= "1110") then
+					table_full := '0';
+				else
+					table_full := '1';
+				end if;
+				next_state <= east1;
+--*EAST*--				
+			when east1 =>
 				--Check flag
 				if(e_CtrlFlg = '1') then
-					if(e_rnaCtrl(10 downto 3) = router_address) then
-						if(table_full = '0') then
-							--Ack!
-							e_CTRflg <= '1', '0' after 1 ns;
-							--Write bits to rsv_packet
-							rsv_packet <= e_rnaCtrl(29 downto 11);
-							--Write bits to sch_packet
-							schedule(conv_integer(w_address)) := e_rnaCtrl(29 downto 14) & e_rnaCtrl(10 downto 3) & (globaltime + e_rnaCtrl(cp_size-1 downto 30));
-							--Send to reservation table
-							rsv_address <= w_address;
-							rsv_rw <= '1';
-							rsv_strobe <= '1', '0' after 1 ns;
-						end if;
-					else
-						--Forward the Packet
-						cp_packet <= e_rnaCtrl;
-						rte_address <= cp_packet(6 downto 3);
-						rte_rw <= '0';
-						forwardPacket <= '1';
-						departurePacket <= '0';
-						rte_strobe <= '1', '0' after 1 ns;
-					end if;
+					next_state <= east2;
+				else
+					next_state <= south1;
 				end if;
-				next_state <= south;
-			when south =>
+			when east2 =>
+				if(e_rnaCtrl(10 downto 3) = router_address) then
+					next_state <= east3;	--It's for me!
+				else
+					next_state <= east4;	--Forward the control packet.
+				end if;
+			when east3 =>
+				if(table_full = '0') then
+					next_state <= east5;
+				else
+					next_state <= south1;
+				end if;
+			when east4 =>
+				--Forward the Packet by checking routing table first
+				address <= e_rnaCtrl(6 downto 3);
+				rw <= '0';
+				rte_en <= '1', '0' after 1 ns;	
+				next_state <= east6;
+			when east5 =>	
+				--Reserve and schedule the incoming control packet
+				--Ack!
+				e_CTRflg <= '1', '0' after 1 ns;
+				--Write bits to rsv_data_out
+				rsv_data_out <= e_rnaCtrl(29 downto 11);
+				--Write bits to sch_packet
+				schedule(conv_integer(w_address)) := e_rnaCtrl(29 downto 14) & e_rnaCtrl(10 downto 3) & (globaltime + e_rnaCtrl(cp_size-1 downto 30));
+				--Store locally
+				address_lut(conv_integer(w_address)) := e_rnaCtrl(29 downto 14);
+				--Send to reservation table
+				address <= w_address;
+				rw <= '1';
+				rsv_en <= '1', '0' after 1 ns;
+				next_state <= east7;
+			when east6 =>
+				--Configure the switch
+				sw_nSel <= rte_data_in(3 downto 1);				--North Neighbor (use Control from Arbiter)
+				--Write to rna_ctrlPkt
+				rna_ctrlPkt <= e_rnaCtrl;
+				next_state <= south1;
+			when east7 =>
+				w_address := w_address + 1;
+				reserved_cnt := reserved_cnt + 1;
+				
+				--Check table space
+				if(reserved_cnt <= "1110") then
+					table_full := '0';
+				else
+					table_full := '1';
+				end if;
+				next_state <= south1;	
+--*SOUTH*--
+			when south1 =>
 				--Check flag
 				if(s_CtrlFlg = '1') then
-					if(s_rnaCtrl(10 downto 3) = router_address) then
-						if(table_full = '0') then
-							--Ack!
-							s_CTRflg <= '1', '0' after 1 ns;
-							--Write bits to rsv_packet
-							rsv_packet <= s_rnaCtrl(29 downto 11);
-							--Write bits to sch_packet
-							schedule(conv_integer(w_address)) := s_rnaCtrl(29 downto 14) & s_rnaCtrl(10 downto 3) & (globaltime + s_rnaCtrl(cp_size-1 downto 30));
-							--Send to reservation table
-							rsv_address <= w_address;
-							rsv_rw <= '1';
-							rsv_strobe <= '1', '0' after 1 ns;
-						end if;
-					else
-						--Forward the Packet
-						cp_packet <= s_rnaCtrl;
-						rte_address <= cp_packet(6 downto 3);
-						rte_rw <= '0';
-						forwardPacket <= '1';
-						departurePacket <= '0';
-						rte_strobe <= '1', '0' after 1 ns;
-					end if;
+					next_state <= south2;
+				else
+					next_state <= west1;
 				end if;
-				next_state <= west;
-			when west =>
+			when south2 =>
+				if(s_rnaCtrl(10 downto 3) = router_address) then
+					next_state <= south3;	--It's for me!
+				else
+					next_state <= south4;	--Forward the control packet.
+				end if;
+			when south3 =>
+				if(table_full = '0') then
+					next_state <= south5;
+				else
+					next_state <= west1;
+				end if;
+			when south4 =>
+				--Forward the Packet by checking routing table first
+				address <= s_rnaCtrl(6 downto 3);
+				rw <= '0';
+				rte_en <= '1', '0' after 1 ns;	
+				next_state <= south6;
+			when south5 =>	
+				--Reserve and schedule the incoming control packet
+				--Ack!
+				s_CTRflg <= '1', '0' after 1 ns;
+				--Write bits to rsv_data_out
+				rsv_data_out <= s_rnaCtrl(29 downto 11);
+				--Write bits to sch_packet
+				schedule(conv_integer(w_address)) := s_rnaCtrl(29 downto 14) & s_rnaCtrl(10 downto 3) & (globaltime + s_rnaCtrl(cp_size-1 downto 30));
+				--Store locally
+				address_lut(conv_integer(w_address)) := s_rnaCtrl(29 downto 14);
+				--Send to reservation table
+				address <= w_address;
+				rw <= '1';
+				rsv_en <= '1', '0' after 1 ns;
+				next_state <= south7;
+			when south6 =>
+				--Configure the switch
+				sw_nSel <= rte_data_in(3 downto 1);				--North Neighbor (use Control from Arbiter)
+				--Write to rna_ctrlPkt
+				rna_ctrlPkt <= s_rnaCtrl;
+				next_state <= west1;
+			when south7 =>
+				w_address := w_address + 1;
+				reserved_cnt := reserved_cnt + 1;
+				
+				--Check table space
+				if(reserved_cnt <= "1110") then
+					table_full := '0';
+				else
+					table_full := '1';
+				end if;
+				next_state <= west1;	
+--*WEST*--
+			when west1 =>
 				--Check flag
 				if(w_CtrlFlg = '1') then
-					if(w_rnaCtrl(10 downto 3) = router_address) then
-						if(table_full = '0') then
-							--Ack!
-							w_CTRflg <= '1', '0' after 1 ns;
-							--Write bits to rsv_packet
-							rsv_packet <= w_rnaCtrl(29 downto 11);
-							--Write bits to sch_packet
-							schedule(conv_integer(w_address)) := w_rnaCtrl(29 downto 14) & w_rnaCtrl(10 downto 3) & (globaltime + w_rnaCtrl(cp_size-1 downto 30));
-							--Send to reservation table
-							rsv_address <= w_address;
-							rsv_rw <= '1';
-							rsv_strobe <= '1', '0' after 1 ns;
-						end if;
-					else
-						--Forward the Packet
-						cp_packet <= w_rnaCtrl;
-						rte_address <= cp_packet(6 downto 3);
-						rte_rw <= '0';
-						forwardPacket <= '1';
-						departurePacket <= '0';
-						rte_strobe <= '1', '0' after 1 ns;
-					end if;
+					next_state <= west2;
+				else
+					next_state <= injection1;
 				end if;
-				next_state <= injection;
-			when injection =>
+			when west2 =>
+				if(w_rnaCtrl(10 downto 3) = router_address) then
+					next_state <= west3;	--It's for me!
+				else
+					next_state <= west4;	--Forward the control packet.
+				end if;
+			when west3 =>
+				if(table_full = '0') then
+					next_state <= west5;
+				else
+					next_state <= injection1;
+				end if;
+			when west4 =>
+				--Forward the Packet by checking routing table first
+				address <= w_rnaCtrl(6 downto 3);
+				rw <= '0';
+				rte_en <= '1', '0' after 1 ns;	
+				next_state <= west6;
+			when west5 =>	
+				--Reserve and schedule the incoming control packet
+				--Ack!
+				w_CTRflg <= '1', '0' after 1 ns;
+				--Write bits to rsv_data_out
+				rsv_data_out <= w_rnaCtrl(29 downto 11);
+				--Write bits to sch_packet
+				schedule(conv_integer(w_address)) := w_rnaCtrl(29 downto 14) & w_rnaCtrl(10 downto 3) & (globaltime + w_rnaCtrl(cp_size-1 downto 30));
+				--Store locally
+				address_lut(conv_integer(w_address)) := w_rnaCtrl(29 downto 14);
+				--Send to reservation table
+				address <= w_address;
+				rw <= '1';
+				rsv_en <= '1', '0' after 1 ns;
+				next_state <= west7;
+			when west6 =>
+				--Configure the switch
+				sw_nSel <= rte_data_in(3 downto 1);				--North Neighbor (use Control from Arbiter)
+				--Write to rna_ctrlPkt
+				rna_ctrlPkt <= w_rnaCtrl;
+				next_state <= injection1;
+			when west7 =>
+				w_address := w_address + 1;
+				reserved_cnt := reserved_cnt + 1;
+				
+				--Check table space
+				if(reserved_cnt <= "1110") then
+					table_full := '0';
+				else
+					table_full := '1';
+				end if;
+				next_state <= injection1;
+--*INJECTION*--
+			when injection1 =>
 				--Check flag
 				if(sw_rnaCtFl = '1') then
-					if(injt_ctrlPkt(10 downto 3) = router_address) then
-						if(injt_ctrlPkt(2 downto 1) = "00") then		  		-- Condition: Normal Packet
-							if(table_full = '0') then
-								--Ack!
-								n_CTRflg <= '1', '0' after 1 ns;
-								--Write bits to rsv_packet
-								rsv_packet <= injt_ctrlPkt(29 downto 11);
-								--Write bits to sch_packet
-								schedule(conv_integer(w_address)) := injt_ctrlPkt(29 downto 14) & injt_ctrlPkt(10 downto 3) & (globaltime + injt_ctrlPkt(cp_size-1 downto 30));
-								--Send to reservation table
-								rsv_address <= w_address;
-								rsv_rw <= '1';
-								rsv_strobe <= '1', '0' after 1 ns;
-							end if;
-						elsif(injt_ctrlPkt(2 downto 1) = "01") then
-							router_address <= injt_ctrlPkt(37 downto 30); 	-- Condition: PE is re/assigning addresses	
-						elsif(injt_ctrlPkt(2 downto 1) = "10") then
-							cp_packet <= injt_ctrlPkt;
-							rte_address <= cp_packet(25 downto 22);
-							rte_packet <= cp_packet(33 downto 30);
-							rte_rw <= '1';
-							forwardPacket <= '0';
-							departurePacket <= '0';
-							rte_strobe <= '1', '0' after 1 ns;					-- Condition: PE is updating Routing Table
-						end if;
-					else
-						--Forward the Packet
-						cp_packet <= injt_ctrlPkt;
-						rte_address <= cp_packet(6 downto 3);
-						rte_rw <= '0';
-						forwardPacket <= '1';
-						departurePacket <= '0';
-						rte_strobe <= '1', '0' after 1 ns;
-					end if;
+					next_state <= injection2;
+				else
+					next_state <= timer_check1;
 				end if;
-				next_state <= timer_check;
-			when timer_check =>
+			when injection2 =>
+				if(injt_ctrlPkt(10 downto 3) = router_address) then
+					next_state <= injection3;	--It's for me!
+				else
+					next_state <= injection7;	--Forward the control packet.
+				end if;
+			when injection3 =>
+				case injt_ctrlPkt(2 downto 1) is
+					when "00" =>
+						next_state <= injection4;	-- Condition: Normal Packet
+					when "01" =>
+						next_state <= injection5;	-- Condition: PE is re/assigning addresses
+					when "10" =>
+						next_state <= injection6;	-- Condition: PE is updating Routing Table
+					when others =>
+						next_state <= timer_check1;	-- Condition: Unknown, move to next state.
+				end case;
+			when injection4 =>
+				if(table_full = '0') then
+					next_state <= injection8;
+				else
+					next_state <= timer_check1;
+				end if;
+			when injection5 =>
+				router_address <= injt_ctrlPkt(37 downto 30);
+				next_state <= timer_check1;
+			when injection6 =>
+				address <= injt_ctrlPkt(25 downto 22);
+				rte_data_out <= injt_ctrlPkt(33 downto 30);
+				rw <= '1';
+				rte_en <= '1', '0' after 1 ns;	
+				next_state <= timer_check1;
+			when injection7 =>
+				--Forward the Packet by checking routing table first
+				address <= injt_ctrlPkt(6 downto 3);
+				rw <= '0';
+				rte_en <= '1', '0' after 1 ns;	
+				next_state <= injection9;
+			when injection8 =>	
+				--Reserve and schedule the incoming control packet
+				--Ack!
+				--Write bits to rsv_data_out
+				rsv_data_out <= injt_ctrlPkt(29 downto 11);
+				--Write bits to sch_packet
+				schedule(conv_integer(w_address)) := injt_ctrlPkt(29 downto 14) & injt_ctrlPkt(10 downto 3) & (globaltime + injt_ctrlPkt(cp_size-1 downto 30));
+				--Store locally
+				address_lut(conv_integer(w_address)) := injt_ctrlPkt(29 downto 14);
+				--Send to reservation table
+				address <= w_address;
+				rw <= '1';
+				rsv_en <= '1', '0' after 1 ns;
+				next_state <= injection10;
+			when injection9 =>
+				--Configure the switch
+				sw_nSel <= rte_data_in(3 downto 1);				--North Neighbor (use Control from Arbiter)
+				--Write to rna_ctrlPkt
+				rna_ctrlPkt <= injt_ctrlPkt;
+				next_state <= timer_check1;
+			when injection10 =>
+				w_address := w_address + 1;
+				reserved_cnt := reserved_cnt + 1;
+				
+				--Check table space
+				if(reserved_cnt <= "1110") then
+					table_full := '0';
+				else
+					table_full := '1';
+				end if;
+				next_state <= timer_check1;	
+--*TIMER_CHECK*--
+			when timer_check1 =>
 				--Check scheduled job and determine if departure is necessary.
 				if(r_address /= w_address and start_timer = '0') then
+					next_state <= timer_check2;
+				else
+					next_state <= timer_check4;
+				end if;
+			when timer_check2 =>
 					--Grab time from scheduler
 					sch_packet := schedule(conv_integer(r_address));
-					next_pkt <= sch_packet(55 downto 40);
-					next_pkt_dst <= sch_packet(39 downto 32);
-					expires_in <= sch_packet(31 downto 0);
+					next_pkt_to_depart <= sch_packet(55 downto 40);
+					next_pkt_expires_in <= sch_packet(31 downto 0);
 					
 					--Grab routing information.
-					rte_address <= next_pkt_dst(3 downto 0);	-- Only doing a max of 16 nodes in network for now
-					rte_rw <= '0';
-					forwardPacket <= '0';
-					departurePacket <= '1';
-					rte_strobe <= '1', '0' after 1 ns;
-					timer_control <= '1', '0' after 1 ns;
-				else
-					timer_control <= '1', '0' after 1 ns;
-				end if;
+					address <= sch_packet(35 downto 32);	-- Only doing a max of 16 nodes in network for now
+					rw <= '0';
+					rte_en <= '1', '0' after 1 ns;
+					next_state <= timer_check3;
+			when timer_check3 =>
+					next_pkt_departing_from_gate <= rte_data_in(3 downto 0);
+					start_timer <= '1';
+					next_state <= dp_arrivedOnNorth1;
+			when timer_check4 =>
+					if(time_expired = '1') then
+						start_timer <= '0';
+						next_state <= departure1;
+					else
+						next_state <= dp_arrivedOnNorth1;
+					end if;
+--*DEPARTURE*--
+			when departure1 =>
+				--Use the routing table info saved in next_pkt_departing_from_gate	
+				--Grab PID/GID from next_pkt_to_depart signal
 				
-				next_state <= dp_arrivedOnNorth;
-			when dp_arrivedOnNorth =>
+				--Control VCC
+				n_vc_rnaSelO <= "00";			-- "00" North FIFO 
+				n_vc_deq <= '1', '0' after 1 ns;
+				
+				--Set Switch to move packet
+				sw_nSel <= "001";					--North Neighbor (use Control from Arbiter)
+				
+				--Check CTR going high to low
+				--wait until falling_edge(n_CTRflg);
+				
+				--Update Space in Reservation Table now that packet has departed
+				r_address := r_address + 1;
+				reserved_cnt := reserved_cnt - 1;
+				
+				--Check table space
+				if(reserved_cnt <= "1110") then
+					table_full := '0';
+				else
+					table_full := '1';
+				end if;
+				next_state <= dp_arrivedOnNorth1;
+--*NORTH ARRIVALS*--
+			when dp_arrivedOnNorth1 =>
 				--Any new data packets?
 				if(n_NeighborCTRflg = '1') then
+					next_state <= dp_arrivedOnNorth2;
+				else
+					next_state <= dp_arrivedOnEast1;
+				end if;
+			when dp_arrivedOnNorth2 =>
 					--for i in 0 to 15 loop
 						--Look for GID/PID 
 						--if()
 					--end loop;
-					rsv_address <= "0000";			--should be the address found above
-					rsv_rw <= '0';
-					rsv_strobe <= '1', '0' after 1 ns;
-				end if;
-				next_state <= dp_arrivedOnEast;
-			when dp_arrivedOnEast =>
+					address <= "0000";			--should be the address found above
+					rw <= '0';
+					rsv_en <= '1', '0' after 1 ns;
+					next_state <= dp_arrivedOnNorth3;
+			when dp_arrivedOnNorth3 =>
+					--Read RSV_TABLE
+					--Control VCC
+					n_vc_rnaSelI <= "00";			--Value from RSV TABLE (PATH) rsv_data_in
+	
+					--Acknowledge? 
+					n_CTRflg <= '1', '0' after 1 ns;
+					next_state <= dp_arrivedOnEast1;
+--*EAST ARRIVALS*--
+			when dp_arrivedOnEast1 =>
 				--Any new data packets?
 				if(e_NeighborCTRflg = '1') then
+					next_state <= dp_arrivedOnEast2;
+				else
+					next_state <= dp_arrivedOnSouth1;
+				end if;
+			when dp_arrivedOnEast2 =>
 					--for i in 0 to 15 loop
 						--Look for GID/PID 
 						--if()
 					--end loop;
-					rsv_address <= "0000";			--should be the address found above
-					rsv_rw <= '0';
-					rsv_strobe <= '1', '0' after 1 ns;
-				end if;
-				next_state <= dp_arrivedOnSouth;
-			when dp_arrivedOnSouth =>
+					address <= "0000";			--should be the address found above
+					rw <= '0';
+					rsv_en <= '1', '0' after 1 ns;
+					next_state <= dp_arrivedOnEast3;
+			when dp_arrivedOnEast3 =>
+					--Read RSV_TABLE
+					--Control VCC
+					n_vc_rnaSelI <= "00";		--Value from RSV TABLE (PATH) rsv_data_in
+	
+					--Acknowledge? 
+					e_CTRflg <= '1', '0' after 1 ns;
+					next_state <= dp_arrivedOnSouth1;
+--*SOUTH ARRIVALS*--
+			when dp_arrivedOnSouth1 =>
 				--Any new data packets?
 				if(s_NeighborCTRflg = '1') then
+					next_state <= dp_arrivedOnSouth2;
+				else
+					next_state <= dp_arrivedOnWest1;
+				end if;
+			when dp_arrivedOnSouth2 =>
 					--for i in 0 to 15 loop
 						--Look for GID/PID 
 						--if()
 					--end loop;
-					rsv_address <= "0000";			--should be the address found above
-					rsv_rw <= '0';
-					rsv_strobe <= '1', '0' after 1 ns;
-				end if;
-				next_state <= dp_arrivedOnWest;
-			when dp_arrivedOnWest =>
+					address <= "0000";			--should be the address found above
+					rw <= '0';
+					rsv_en <= '1', '0' after 1 ns;
+					next_state <= dp_arrivedOnSouth3;
+			when dp_arrivedOnSouth3 =>
+					--Read RSV_TABLE
+					--Control VCC
+					n_vc_rnaSelI <= "00";		--Value from RSV TABLE (PATH) rsv_data_in
+	
+					--Acknowledge? 
+					s_CTRflg <= '1', '0' after 1 ns;
+					next_state <= dp_arrivedOnWest1;
+--*WEST ARRIVALS*--
+			when dp_arrivedOnWest1 =>
 				--Any new data packets?
 				if(w_NeighborCTRflg = '1') then
+					next_state <= dp_arrivedOnWest2;
+				else
+					next_state <= start;
+				end if;
+			when dp_arrivedOnWest2 =>
 					--for i in 0 to 15 loop
 						--Look for GID/PID 
 						--if()
 					--end loop;
-					rsv_address <= "0000";			--should be the address found above
-					rsv_rw <= '0';
-					rsv_strobe <= '1', '0' after 1 ns;
-				end if;
-				next_state <= start;
+					address <= "0000";			--should be the address found above
+					rw <= '0';
+					rsv_en <= '1', '0' after 1 ns;
+					next_state <= dp_arrivedOnWest3;
+			when dp_arrivedOnWest3 =>
+					--Read RSV_TABLE
+					--Control VCC
+					n_vc_rnaSelI <= "00";			--Value from RSV TABLE (PATH) rsv_data_in
+	
+					--Acknowledge? 
+					w_CTRflg <= '1', '0' after 1 ns;
+					next_state <= start;
 			when others =>
 				next_state <= start;
 		end case;
 	end process;
-	
-	cpAccessRsvRteTable_process: process(rsv_strobe, rte_strobe)
-	begin
-		if rsv_strobe = '1' then
-			address <= rsv_address;		--rsv_address = w_address || index ("0000");
-			rsv_data_out <= rsv_packet;
-			rsv_packet_info <= rsv_data_in;
-			rw <= rsv_rw;
-			rsv_en <= '1', '0' after 1 ns;
-			
-			if rsv_rw = '1' then
-				updateWrite <= '1', '0' after 1 ns;
-			else
-				arrival <= '1', '0' after 1 ns;
-			end if;
-		end if;
 		
-		if rte_strobe = '1' then
-			address <= rte_address; 
-			rte_data_out <= rte_packet;
-			rte_packet_info <= rte_data_in;
-			rw <= rte_rw;
-			rte_en <= '1', '0' after 1 ns;
-			
-			if forwardPacket = '1' then
-				forwardPkt_strobe <= '1', '0' after 1 ns;
-			elsif departurePacket = '1' then
-				departingFromGate <= rte_packet_info;
-			end if;
-		end if;
-			
-	end process;
-	
-	--cpSchedulerTimerControl_process: This is the process that determines if the scheduled time starts
-	--											  or stops and begins the departure sequence of the packet.
-	cpSchedulerTimerControl_process: process(timer_control)
-	begin
-		if timer_control'event and timer_control = '1' then
-			if(r_address /= w_address and start_timer = '0') then
-				start_timer <= '1';
-			else
-				if(time_expired = '1') then
-					start_timer <= '0';
-					--initiate departure
-					departure <= '1', '0' after 1 ns;
-				end if;
-			end if;
-		end if;
-	end process;
-	
-	--cpUpdateCounters_process: This process is responsible for sending the next packet 
-	--								out through the switch.	
-	cpUpdateCounters_process: process(updateWrite, updateRead)
-	begin
-		if updateRead = '1' then
-				--Update Counts and Check if the table has reached full capacity
-				r_address <= r_address + 1;
-				reserved_cnt <= reserved_cnt - 1;
-		end if;
-		
-		if updateWrite = '1' then
-				w_address <= w_address + 1;
-				reserved_cnt <= reserved_cnt + 1;		
-		end if;
-		
-		--Check table space
-		if(reserved_cnt <= "1110") then
-			table_full <= '0';
-		else
-			table_full <= '1';
-		end if;
-	end process;
-	
-	
-	packetHandler_process: process(forwardPkt_strobe, departure, arrival)
-	begin
-		if forwardPkt_strobe = '1' then
-			--Configure the switch
-			--rte_packet_info
-			sw_nSel <= "111";				--North Neighbor (use Control from Arbiter)
-			
-			--Write to rna_ctrlPkt
-			rna_ctrlPkt <= cp_packet;
-		end if;
-		
-		if departure = '1' then
-			--Look up Routing Table (departingFromGate)
-			--Grab PID/GID from next_pkt signal
-			--Control VCC
-			n_vc_rnaSelO <= "00";			-- "00" North FIFO 
-			n_vc_deq <= '1', '0' after 1 ns;
-			
-			--Set Switch to move packet
-			sw_nSel <= "001";					--North Neighbor (use Control from Arbiter)
-			
-			--Check CTR going high to low
-			--wait until falling_edge(n_CTRflg);
-			
-			--Update Space in Reservation Table now that packet has departed
-			updateRead <= '1', '0' after 1 ns;
-		end if;
-		
-		if arrival = '1' then
-			--Read RSV_TABLE
-			--Control VCC
-			n_vc_rnaSelI <= "00";			--Value from RSV TABLE (PATH)
-	
-			--Acknowledge? 
-			--n_CTRflg <= '1', '0' after 1 ns;		(doesn't work)
-		end if;
-	end process;
-	
 end Behavioral;
 
