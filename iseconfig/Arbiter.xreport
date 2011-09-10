@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <report-views version="1.7" >
  <header>
-  <DateModified>2011-09-09T20:03:06</DateModified>
+  <DateModified>2011-09-10T16:28:37</DateModified>
   <ModuleName>Arbiter</ModuleName>
-  <SummaryTimeStamp>2011-09-09T20:00:17</SummaryTimeStamp>
+  <SummaryTimeStamp>2011-09-10T16:05:22</SummaryTimeStamp>
   <DateInitialized>2011-06-04T20:31:37</DateInitialized>
   <ImplementationReportsDirectory>C:/Users/kor/Documents/ArbiterTest\</ImplementationReportsDirectory>
   <SavedFilePath>C:/Users/kor/Documents/ArbiterTest/iseconfig/Arbiter.xreport</SavedFilePath>
@@ -29,7 +29,7 @@
   </viewgroup>
   <viewgroup label="Errors and Warnings" >
    <view inputState="Unknown" program="pn" WrapMessages="true" contextTags="EDK_OFF" type="MessageList" hideColumns="Filtered, New" file="_xmsgs/pn_parser.xmsgs" label="Parser Messages" />
-   <view program="xst" type="MessageList" hideColumns="Filtered" file="_xmsgs/xst.xmsgs" label="Synthesis Messages" />
+   <view program="xst" type="MessageList" hideColumns="Filtered" collate="2" file="_xmsgs/xst.xmsgs" label="Synthesis Messages" />
    <view inputState="Synthesized" program="ngdbuild" type="MessageList" hideColumns="Filtered" file="_xmsgs/ngdbuild.xmsgs" label="Translation Messages" />
    <view inputState="Translated" program="map" type="MessageList" hideColumns="Filtered" file="_xmsgs/map.xmsgs" label="Map Messages" />
    <view inputState="Mapped" program="par" type="MessageList" hideColumns="Filtered" file="_xmsgs/par.xmsgs" label="Place and Route Messages" />

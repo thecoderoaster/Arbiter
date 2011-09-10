@@ -263,12 +263,12 @@ BEGIN
 		w_rnaCtrl <= "00000000000000000000000000000000000000000000000000000000000000";
 		injt_ctrlPkt <= "00000000000000000000000000000000000000000000000000000000000000";
 		
-		--Initiate a Reset
 		reset <= '0';
-		wait for 1 ps;
-		reset <= '1';
-		wait for 1 ps;
-		reset <= '0';
+		
+		--Initiate a Reset		
+		wait for clk_period*2;
+		reset <= '1', '0' after clk_period;
+		wait for clk_period*2;
 		
 		--Update Routing Table
 		
