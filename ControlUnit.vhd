@@ -202,6 +202,7 @@ begin
 		variable w_address 			: std_logic_vector(address_size-1 downto 0);
 		variable r_address			: std_logic_vector(address_size-1 downto 0);
 		variable reserved_cnt		: std_logic_vector(address_size-1 downto 0);
+		variable found					: std_logic_vector(address_size-1 downto 0);
 		variable table_full 			: std_logic;
 	
 		begin
@@ -211,6 +212,7 @@ begin
 					w_address := std_logic_vector(to_unsigned(0, w_address'length));
 					r_address := std_logic_vector(to_unsigned(0, r_address'length));
 					reserved_cnt := std_logic_vector(to_unsigned(0, reserved_cnt'length));
+					found := std_logic_vector(to_unsigned(0, found'length));
 					table_full := '0';
 					
 					router_address <= std_logic_vector(to_unsigned(0, router_address'length));
@@ -605,8 +607,12 @@ begin
 						next_state <= dp_arrivedOnEast1;
 					end if;
 				when dp_arrivedOnNorth2 =>
-						
-						address <= "0000";			--should be the address found above
+						found := std_logic_vector(to_unsigned(0, found'length));
+						for i in address_lut'range loop
+							exit when address_lut(i) = n_rnaCtrl(29 downto 14);
+							found := found + "0001";
+						end loop;
+						address <= found;			--should be the address found above
 						rsv_en <= '0';
 						next_state <= dp_arrivedOnNorth3;
 				when dp_arrivedOnNorth3 =>
@@ -639,11 +645,12 @@ begin
 						next_state <= dp_arrivedOnSouth1;
 					end if;
 				when dp_arrivedOnEast2 =>
-						--for i in 0 to 15 loop
-							--Look for GID/PID 
-							--if()
-						--end loop;
-						address <= "0000";			--should be the address found above
+						found := std_logic_vector(to_unsigned(0, found'length));
+						for i in address_lut'range loop
+							exit when address_lut(i) = n_rnaCtrl(29 downto 14);
+							found := found + "0001";
+						end loop;
+						address <= found;			--should be the address found above
 						rsv_en <= '0';
 						next_state <= dp_arrivedOnEast3;
 				when dp_arrivedOnEast3 =>
@@ -676,11 +683,12 @@ begin
 						next_state <= dp_arrivedOnWest1;
 					end if;
 				when dp_arrivedOnSouth2 =>
-						--for i in 0 to 15 loop
-							--Look for GID/PID 
-							--if()
-						--end loop;
-						address <= "0000";			--should be the address found above
+						found := std_logic_vector(to_unsigned(0, found'length));
+						for i in address_lut'range loop
+							exit when address_lut(i) = n_rnaCtrl(29 downto 14);
+							found := found + "0001";
+						end loop;
+						address <= found;			--should be the address found above
 						rsv_en <= '0';
 						next_state <= dp_arrivedOnSouth3;
 				when dp_arrivedOnSouth3 =>
@@ -713,11 +721,12 @@ begin
 						next_state <= north1;
 					end if;
 				when dp_arrivedOnWest2 =>
-						--for i in address_lut( loop
-							--Look for GID/PID 
-							--if()
-						--end loop;
-						address <= "0000";			--should be the address found above
+						found := std_logic_vector(to_unsigned(0, found'length));
+						for i in address_lut'range loop
+							exit when address_lut(i) = n_rnaCtrl(29 downto 14);
+							found := found + "0001";
+						end loop;
+						address <= found;			--should be the address found above
 						rsv_en <= '0';
 						next_state <= dp_arrivedOnWest3;
 				when dp_arrivedOnWest3 =>
