@@ -401,7 +401,31 @@ BEGIN
 		injt_ctrlPkt <= "00000000000000000000000000000000" & "00000001" & "00000101" & "111" & "00001001" & "00" & "0";
 		sw_rnaCtFl <= '1';
 		
-		wait for 10000 ms;
+		wait for clk_period*20;
+		
+		--PAYLOAD = 155 Cycles (TID) : GID = 0x01 (SOURCE)	: PID = 0x01 (PKT ID) :	DIR = 0x001 (EAST) : ADDR = 0x01 (ROUTER ADDRESS) : COND = 0x00
+		n_rnaCtrl <= "00000000000000000000000010011011" & "00000001" & "00000010" & "111" & "00000001" & "00" & "0"; 
+		n_CtrlFlg <= '1';
+		
+		wait for clk_period*20;
+		
+		--PAYLOAD = 395 Cycles (TID) : GID = 0x01 (SOURCE)	: PID = 0x01 (PKT ID) :	DIR = 0x001 (EAST) : ADDR = 0x01 (ROUTER ADDRESS) : COND = 0x00
+		n_rnaCtrl <= "00000000000000000000000110001011" & "00000010" & "00000001" & "010" & "00000001" & "00" & "0"; 
+		n_CtrlFlg <= '1';
+		
+		wait for clk_period*30;
+		
+		--PAYLOAD = 134218395 Cycles (TID) : GID = 0x01 (SOURCE)	: PID = 0x01 (PKT ID) :	DIR = 0x001 (EAST) : ADDR = 0x01 (ROUTER ADDRESS) : COND = 0x00
+		n_rnaCtrl <= "00001000000000000000001010011011" & "00000011" & "00000001" & "011" & "00000001" & "00" & "0"; 
+		n_CtrlFlg <= '1';
+		
+		wait for clk_period*30;
+		
+		--PAYLOAD = 27 Cycles (TID) : GID = 0x01 (SOURCE)	: PID = 0x01 (PKT ID) :	DIR = 0x001 (EAST) : ADDR = 0x01 (ROUTER ADDRESS) : COND = 0x00
+		n_rnaCtrl <= "00000000000000000000000000011011" & "00001001" & "00000001" & "011" & "00000001" & "00" & "0"; 
+		n_CtrlFlg <= '1';
+		
+		wait for clk_period*200;
 		
 		n_NeighborCTRflg <= '1'; --, '0' after 1 ns;
 		

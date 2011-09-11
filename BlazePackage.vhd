@@ -13,16 +13,17 @@ package router_library is
 	--Universal constants Go Here (these are things that determine dimensions and can be changed on the fly)
 	constant WIDTH			: integer := 31;
 	constant CP_WIDTH		: integer := 62;
-	constant	RSV_WIDTH 	: integer := 3;		--was 19
-	constant SCH_WIDTH	: integer := 32;		--was 56
+	constant	RSV_WIDTH 	: integer := 3;
+	constant SCH_WIDTH	: integer := 32;
 	constant RTE_WIDTH	: integer := 3;
+	constant ADR_WIDTH	: integer := 16;
 	constant PID_WIDTH	: integer := 8;
 	constant GID_WIDTH	: integer := 8;
 	constant PATH_WIDTH	: integer := 3;
 	constant CON_WIDTH	: integer := 2;
 	constant TID_WIDTH	: integer := 32;
 	constant SIZE			: integer := 10;
-	constant LUT_SIZE 	: integer := 15;				--16 entries
+	constant LUT_SIZE 	: integer := 15;			--16 entries
 	constant ADDR_WIDTH	: integer := 4;			--2^4 = (3 downto 0) possible entries (16)
 	
 	--Buffer Status Codes Go Here

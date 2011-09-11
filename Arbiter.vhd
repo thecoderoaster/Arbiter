@@ -146,12 +146,25 @@ architecture rtl of Arbiter is
 		   );
 	end component;
 	
+	component AddressLUT
+	generic(word_size		: natural;
+			  address_size : natural);
+	port (  d 			: in  std_logic_vector(word_size-1 downto 0);
+			  clk			: in std_logic;
+			  addr 		: in std_logic_vector(address_size-1 downto 0);
+           en 			: in  std_logic;
+			  search		: in std_logic;
+			  result		: out std_logic_vector(address_size-1 downto 0);
+           q 			: out std_logic_vector(word_size-1 downto 0));
+	end component;
+	
 	component ControlUnit
 	generic(cp_size		: natural;
 			  address_size : natural;
 			  rsv_size 		: natural;
 			  rte_size		: natural;
-			  sch_size		: natural);
+			  sch_size		: natural;
+			  adr_size		: natural);
 	port(
 			clk				   : in std_logic;
 			rst					: in std_logic;
@@ -161,10 +174,15 @@ architecture rtl of Arbiter is
 			rte_data_out		: out std_logic_vector(rte_size-1 downto 0);
 			sch_data_in			: in std_logic_vector (sch_size-1 downto 0);
 			sch_data_out		: out std_logic_vector (sch_size-1 downto 0);
+			adr_data_in			: in 	std_logic_vector (adr_size-1 downto 0);
+			adr_data_out		: out std_logic_vector (adr_size-1 downto 0);
 			address				: out std_logic_vector (address_size-1 downto 0);
 			rsv_en				: out std_logic;
 			rte_en				: out std_logic;
 			sch_en 				: out std_logic;
+			adr_en				: out std_logic;
+			adr_search			: out std_logic;
+			adr_result			: in 	std_logic_vector (address_size-1 downto 0);
 			n_vc_deq 			: out  std_logic;
 			n_vc_rnaSelI 		: out  std_logic_vector (1 downto 0);		 
 			n_vc_rnaSelO 		: out  std_logic_vector (1 downto 0);		
@@ -227,6 +245,11 @@ architecture rtl of Arbiter is
 	signal sch_data_in			: std_logic_vector (SCH_WIDTH-1 downto 0);
 	signal sch_data_out			: std_logic_vector (SCH_WIDTH-1 downto 0);
 	signal sch_en					: std_logic;
+	signal adr_data_in			: std_logic_vector (ADR_WIDTH-1 downto 0);
+	signal adr_data_out			: std_logic_vector (ADR_WIDTH-1 downto 0);
+	signal adr_en					: std_logic;
+	signal adr_search				: std_logic;
+	signal adr_result				: std_logic_vector (ADDR_WIDTH-1 downto 0);
 	signal address					: std_logic_vector (ADDR_WIDTH-1 downto 0);
 	
 	
@@ -244,10 +267,15 @@ begin
 		generic map (SCH_WIDTH, ADDR_WIDTH)
 		port map (sch_data_in, clk, address, sch_en, sch_data_out);
 	
+	AdrTable: AddressLUT
+		generic map (ADR_WIDTH, ADDR_WIDTH)
+		port map (adr_data_in, clk, address, adr_en, adr_search, adr_result, adr_data_out);
+	
 	Control	: ControlUnit
-		generic map (CP_WIDTH, ADDR_WIDTH, RSV_WIDTH, RTE_WIDTH, SCH_WIDTH)
+		generic map (CP_WIDTH, ADDR_WIDTH, RSV_WIDTH, RTE_WIDTH, SCH_WIDTH, ADR_WIDTH)
 		port map (clk, reset, rsv_data_out, rsv_data_in, rte_data_out, rte_data_in, 
-					sch_data_out, sch_data_in, address, rsv_en, rte_en, sch_en,
+					sch_data_out, sch_data_in, adr_data_out, adr_data_in, address, 
+					rsv_en, rte_en, sch_en, adr_en, adr_search, adr_result,
 					n_vc_deq, n_vc_rnaSelI, n_vc_rnaSelO, n_vc_rnaSelS, n_vc_strq, n_vc_status,
 					e_vc_deq, e_vc_rnaSelI, e_vc_rnaSelO, e_vc_rnaSelS, e_vc_strq, e_vc_status,
 					s_vc_deq, s_vc_rnaSelI, s_vc_rnaSelO, s_vc_rnaSelS, s_vc_strq, s_vc_status,
